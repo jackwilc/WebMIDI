@@ -20,6 +20,7 @@ var $pad = $(".pad")
                                 // var r = 'rotate(' + (pulse.beat() % 8) * 45 + 'deg)';
                                 // $('#deck div').css('transform', r);
                                 $('#overlay').css('opacity', pulse.pulse() * 0.8)
+                                $("p").text(Math.round(pulse.bpm * 10) / 10);
                                 setTimeout(show, 10);
                             }
                              show();
