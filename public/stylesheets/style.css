@@ -245,8 +245,17 @@ table{
  -------------------------------------------------------------- */
 
 body {
-    background: linear-gradient(135deg, #dc80ed 0%,#eaba4b 100%);
+    /*background: linear-gradient(135deg, #dc80ed 0%,#eaba4b 100%); */
+    background: linear-gradient(135deg, #504A51 0%,#302424 100%);
+    background-image: url("/images/noisy_net.png");
+    background-repeat: repeat;
     color:#f4f4f4;
+    -webkit-touch-callout: none;
+    -webkit-user-select: none;
+    -khtml-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
 }
 
 a,a:visited {
@@ -254,9 +263,7 @@ a,a:visited {
 }
 
 #container {
-    width:100%;
-    max-width:660px;
-    min-width:200px;
+    max-width:800px;
     padding:30px 20px;
     margin:0 auto;
 }

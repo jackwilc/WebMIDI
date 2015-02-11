@@ -1,3 +1,4 @@
+//$.backstretch("/images/background1.jpg");
 var socket = io.connect('http://192.168.0.3'); // change to appropiate for network access
 var $pad = $(".pad")
                             .xy({
@@ -11,7 +12,7 @@ var $pad = $(".pad")
                                         socket.emit('notedown',{message: value[0], message1: value[1]});
                                     }
                                 })
-                            .css({'border':'5px solid #fff'});
+                            .css({'border':'2px dashed #fff'});
 
                              var pulse = new Pulse();
                              pulse.connect('http://192.168.0.3');
@@ -19,9 +20,20 @@ var $pad = $(".pad")
                                 // document.getElementById('record').style.transform = 'rotate(' + (pulse.beat() % 1) * 360 + 'deg)';
                                 // var r = 'rotate(' + (pulse.beat() % 8) * 45 + 'deg)';
                                 // $('#deck div').css('transform', r);
-                                $('#overlay').css('opacity', pulse.pulse() * 0.8)
+                                $('#overlay').css('opacity', pulse.pulse() * 0.1)
                                 $("p").text(Math.round(pulse.bpm * 10) / 10);
                                 setTimeout(show, 10);
                             }
                              show();
+
+document.onmousedown=disableclick;
+function disableclick(event)
+{
+  if(event.button==2)
+   {
+     return false;    
+   }
+}
+
+
 

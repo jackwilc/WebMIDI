@@ -48,10 +48,12 @@ app.configure('production', function(){
 
 // Routes
 app.get('/', routes.index);
+console.log("-----------------------------------------");
+console.log("WEB MIDI");
+console.log("-----------------------------------------");
 
 //If program missing required arguments
 if (process.argv.length < 3){
-  console.log('');
   console.log('Run the server using arguments [device_id] [port]');
   console.log('');
   console.log("The following MIDI devices were detected:");
@@ -70,7 +72,8 @@ if (process.argv.length < 3){
   var deviceID = parseInt(process.argv[2])
 
   if (deviceID >= devices.length){
-    throw "Device " + deviceID + " unknown."
+    console.log('ERROR: UNKNOWN DEVICE ID');
+    process.exit(0);
   }
 
   console.log("Listening to device " + deviceID + ": " + devices[deviceID])
