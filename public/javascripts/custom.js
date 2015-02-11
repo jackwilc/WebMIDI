@@ -12,7 +12,7 @@ var $pad = $(".pad")
                                         socket.emit('notedown',{message: value[0], message1: value[1]});
                                     }
                                 })
-                            .css({'border':'2px dashed #fff'});
+                            .css({'border':'4px dashed #fff'});
 
                              var pulse = new Pulse();
                              pulse.connect('http://192.168.0.3');
@@ -21,7 +21,7 @@ var $pad = $(".pad")
                                 // var r = 'rotate(' + (pulse.beat() % 8) * 45 + 'deg)';
                                 // $('#deck div').css('transform', r);
                                 $('#overlay').css('opacity', pulse.pulse() * 0.1)
-                                $("p").text(Math.round(pulse.bpm * 10) / 10);
+                                $("p#bpm").text('BPM: ' + Math.round(pulse.bpm * 10) / 10);
                                 setTimeout(show, 10);
                             }
                              show();
@@ -34,6 +34,3 @@ function disableclick(event)
      return false;    
    }
 }
-
-
-
