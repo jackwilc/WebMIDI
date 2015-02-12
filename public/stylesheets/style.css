@@ -1,5 +1,8 @@
 /* =Normalize
 ----------------------------------------------------------------------------------------------------*/
+* {
+  margin: 0;
+}
 .dial{
     display: none;
 }
@@ -295,9 +298,31 @@ a,a:visited {
 
 #container {
     width:308px;
+    min-height: 90%;
+    margin-bottom: 30px;
     padding:20px 0px;
     margin:0 auto;
 }
+
+#container:after {
+  content: "";
+  display: block;
+}
+
+.site-footer, #container:after{
+
+  height: 30px; 
+}
+
+.site-footer{
+    font-size: 10px;
+    width: 300px;
+    margin-left: auto;
+    margin-right: auto;
+    margin-top: -40px;
+    text-align: right;
+}
+
 
 #controller {
     display: none;
