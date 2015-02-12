@@ -137,7 +137,12 @@ io.sockets.on('connection', function (socket) {
   });
 
   socket.on('dialchange',function(data){
-    midiOut.sendMessage(help.noteOn(60, data.message));
+    midiOut.sendMessage(help.noteOn(62, data.message));
+    socket.broadcast.emit('playeddown',{'message':data.message});
+  });
+
+  socket.on('barchange',function(data){
+    midiOut.sendMessage(help.noteOn(63, data.message));
     socket.broadcast.emit('playeddown',{'message':data.message});
   });
 

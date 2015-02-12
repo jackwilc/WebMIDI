@@ -30,6 +30,10 @@ $(".dial")
 $(".bars").bars({
                             fgColor:"#fff"
                             , bgColor:"#EEEEEE"
+                            , change : function (value) {
+                                        console.log("change : ", value);
+                                        socket.emit('barchange',{message: value[0]});
+                                    }
                         });
 
                              var pulse = new Pulse();
