@@ -1,10 +1,22 @@
 /* =Normalize
 ----------------------------------------------------------------------------------------------------*/
+.dial{
+    display: none;
+}
+
+.bars{
+    display: none;
+}
 
 article, aside, details, figcaption, figure, footer, 
 header, hgroup, nav, section, summary{
  display:block}
-
+div#redbar{
+    margin-top: 10px;
+    background-color: red;
+    height: 2px;
+    width: 100%;
+}
 audio, 
 canvas, 
 video{
@@ -26,7 +38,9 @@ html{
   margin: 0;
     padding: 0;
 }
-
+a{
+    text-decoration:none;
+}
 #overlay {
     background: white;
     width: 100%;
@@ -62,7 +76,11 @@ a:focus{
 
 a:hover, 
 a:active{
- outline:0}
+
+ outline:0
+ color: #C47300;
+
+}
 
 h1{
  font-size:2em; 
@@ -107,7 +125,7 @@ mark{
 
 p, 
 pre{
- margin:1em 0}
+ margin:8px 0}
 
 pre, 
 code, 
@@ -276,7 +294,7 @@ a,a:visited {
 }
 
 #container {
-    width:90%;
+    width:308px;
     padding:20px 0px;
     margin:0 auto;
 }

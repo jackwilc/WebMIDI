@@ -14,6 +14,24 @@ var $pad = $(".pad")
                                 })
                             .css({'border':'4px dashed #fff'});
 
+$(".dial")
+                    .dial({
+                            min: 0
+                            , max:127
+                            , fgColor:"#fff"
+                            , bgColor:"#333333"
+                            , change : function (value) {
+                                        //console.log("change : ", value);
+                                        socket.emit('dialchange',{message: value});
+                                    }
+                        })
+                    .css({display:'inline'});
+
+$(".bars").bars({
+                            fgColor:"#fff"
+                            , bgColor:"#EEEEEE"
+                        });
+
                              var pulse = new Pulse();
                              pulse.connect('http://192.168.0.3');
                              function show(){
@@ -21,10 +39,12 @@ var $pad = $(".pad")
                                 // var r = 'rotate(' + (pulse.beat() % 8) * 45 + 'deg)';
                                 // $('#deck div').css('transform', r);
                                 $('#overlay').css('opacity', pulse.pulse() * 0.1)
-                                $("p#bpm").text('BPM: ' + Math.round(pulse.bpm * 10) / 10);
+                                //$("#redbar").css('width', pulse.pulse() * 100 + '%');
+                                $("p#bpm").text('BPM: ' + Math.round(pulse.bpm));
                                 setTimeout(show, 10);
                             }
                              show();
+
 
 document.onmousedown=disableclick;
 function disableclick(event)

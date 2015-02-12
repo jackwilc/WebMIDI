@@ -1,5 +1,5 @@
 //CONFIG
-var port = 3000;
+var port = 80;
 
 //MIDI Variables
 var MIDI_PPQN = 24;
@@ -46,8 +46,11 @@ app.configure('production', function(){
   app.use(express.errorHandler());
 });
 
-// Routes
+// Add Routes
 app.get('/', routes.index);
+app.get('/dial', routes.dial);
+app.get('/bars', routes.bars);
+
 console.log("-----------------------------------------");
 console.log("WEB MIDI");
 console.log("-----------------------------------------");
@@ -130,6 +133,11 @@ io.sockets.on('connection', function (socket) {
   socket.on('notedown',function(data){
     midiOut.sendMessage(help.noteOn(60, data.message));
     midiOut.sendMessage(help.noteOn(61, data.message1));
+    socket.broadcast.emit('playeddown',{'message':data.message});
+  });
+
+  socket.on('dialchange',function(data){
+    midiOut.sendMessage(help.noteOn(60, data.message));
     socket.broadcast.emit('playeddown',{'message':data.message});
   });
 

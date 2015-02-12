@@ -2,11 +2,9 @@ div#overlay
 #container
     
     
-        fieldset.pad(data-width='300' data-height='300')
-                    input(name='x' value='27')
-                    input(name='y' value='80')
-            div#redbar
-        p#bpm
+        input.dial(data-width="300" data-height="308" value="0")
+        div#redbar
+        p#bpm 
         p
             a(href="/")
                 XY XY PAD
@@ -16,8 +14,6 @@ div#overlay
             &nbsp;&#124;&nbsp;
             a(href="/bars")
                 XY BARS
-
-
 
 script(type="text/javascript", src="/javascripts/jquery.min.js")
 script(type="text/javascript", src="/javascripts/jquery.kontrol.js")
