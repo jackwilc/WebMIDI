@@ -141,8 +141,31 @@ io.sockets.on('connection', function (socket) {
     socket.broadcast.emit('playeddown',{'message':data.message});
   });
 
-  socket.on('barchange',function(data){
+  socket.on('bar1change',function(data){
+
     midiOut.sendMessage(help.noteOn(63, data.message));
+
+    socket.broadcast.emit('playeddown',{'message':data.message});
+  });
+
+  socket.on('bar2change',function(data){
+
+    midiOut.sendMessage(help.noteOn(64, data.message));
+
+    socket.broadcast.emit('playeddown',{'message':data.message});
+  });
+
+  socket.on('bar3change',function(data){
+
+    midiOut.sendMessage(help.noteOn(65, data.message));
+
+    socket.broadcast.emit('playeddown',{'message':data.message});
+  });
+
+  socket.on('bar4change',function(data){
+
+    midiOut.sendMessage(help.noteOn(66, data.message));
+
     socket.broadcast.emit('playeddown',{'message':data.message});
   });
 

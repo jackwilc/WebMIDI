@@ -14,12 +14,13 @@ var $pad = $(".pad")
                                 })
                             .css({'border':'4px dashed #fff'});
 
-$(".dial")
+var dial = $(".dial")
                     .dial({
                             min: 0
                             , max:127
                             , fgColor:"#fff"
                             , bgColor:"#333333"
+                            , cursor: 50
                             , change : function (value) {
                                         //console.log("change : ", value);
                                         socket.emit('dialchange',{message: value});
@@ -27,12 +28,25 @@ $(".dial")
                         })
                     .css({display:'inline'});
 
+
 $(".bars").bars({
                             fgColor:"#fff"
                             , bgColor:"#EEEEEE"
                             , change : function (value) {
                                         console.log("change : ", value);
-                                        socket.emit('barchange',{message: value[0]});
+
+                                        if(value[0] !== undefined){
+                                        socket.emit('bar1change',{message: value[0]});
+                                        }
+                                        if(value[1] !== undefined){
+                                        socket.emit('bar2change',{message: value[1]});
+                                        }
+                                        if(value[2] !== undefined){
+                                        socket.emit('bar3change',{message: value[2]});
+                                        }
+                                        if(value[3] !== undefined){
+                                        socket.emit('bar4change',{message: value[3]});
+                                        }
                                     }
                         });
 
