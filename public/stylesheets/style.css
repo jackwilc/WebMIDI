@@ -1,10 +1,25 @@
 /* =Normalize
 ----------------------------------------------------------------------------------------------------*/
+* {
+  margin: 0;
+}
+.dial{
+    display: none;
+}
+
+.bars{
+    display: none;
+}
 
 article, aside, details, figcaption, figure, footer, 
 header, hgroup, nav, section, summary{
  display:block}
-
+div#redbar{
+    margin-top: 10px;
+    background-color: red;
+    height: 2px;
+    width: 100%;
+}
 audio, 
 canvas, 
 video{
@@ -26,7 +41,9 @@ html{
   margin: 0;
     padding: 0;
 }
-
+a{
+    text-decoration:none;
+}
 #overlay {
     background: white;
     width: 100%;
@@ -36,6 +53,16 @@ html{
     opacity: 0;
 }
 
+p#bpm{
+    font-size: 20px;
+    letter-spacing: 2px;
+    color: #F9FC8B;
+}
+
+canvas { display:block; }
+
+html, body { width:100%; height:100%; }
+
 html, 
 button, 
 input, 
@@ -44,14 +71,19 @@ textarea{
  font-family:sans-serif}
 
 body{
- margin:0}
+ margin:0
+}
 
 a:focus{
  outline:thin dotted}
 
 a:hover, 
 a:active{
- outline:0}
+
+ outline:0
+ color: #C47300;
+
+}
 
 h1{
  font-size:2em; 
@@ -96,7 +128,7 @@ mark{
 
 p, 
 pre{
- margin:1em 0}
+ margin:8px 0}
 
 pre, 
 code, 
@@ -245,8 +277,19 @@ table{
  -------------------------------------------------------------- */
 
 body {
-    background: linear-gradient(135deg, #dc80ed 0%,#eaba4b 100%);
+    /*background: linear-gradient(135deg, #dc80ed 0%,#eaba4b 100%); */
+    background: linear-gradient(135deg, #504A51 0%,#302424 100%);
+    background: #262626;
+    /*background-image: url("/images/noisy_net.png"); */
+    background-repeat: repeat;
     color:#f4f4f4;
+    -webkit-touch-callout: none;
+    -webkit-user-select: none;
+    -khtml-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
+    overflow: hidden;
 }
 
 a,a:visited {
@@ -254,12 +297,32 @@ a,a:visited {
 }
 
 #container {
-    width:100%;
-    max-width:660px;
-    min-width:200px;
-    padding:30px 20px;
+    width:308px;
+    min-height: 90%;
+    margin-bottom: 30px;
+    padding:20px 0px;
     margin:0 auto;
 }
+
+#container:after {
+  content: "";
+  display: block;
+}
+
+.site-footer, #container:after{
+
+  height: 30px; 
+}
+
+.site-footer{
+    font-size: 10px;
+    width: 300px;
+    margin-left: auto;
+    margin-right: auto;
+    margin-top: -40px;
+    text-align: right;
+}
+
 
 #controller {
     display: none;

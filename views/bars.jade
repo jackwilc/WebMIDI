@@ -2,21 +2,22 @@ div#overlay
 #container
     
     
-        fieldset.pad(data-width='300' data-height='300')
-                    input(name='x' value='27')
-                    input(name='y' value='80')
-            div#redbar
-        p#bpm
+        fieldset.bars(data-width="308" data-height="332" data-cols="4" data-min="0" data-max="127")
+            input(value=90)
+            input(value=40)
+            input(value=20)
+            input(value=70)
+        div#redbar
+        p#bpm 
         p
             a(href="/") XY PAD
             &nbsp;&#124;&nbsp;
             a(href="/dial") DIAL
             &nbsp;&#124;&nbsp;
             a(href="/bars") BARS
+
 footer.site-footer
     p WebMIDI v0.1
-
-
 
 script(type="text/javascript", src="/javascripts/jquery.min.js")
 script(type="text/javascript", src="/javascripts/jquery.kontrol.js")
