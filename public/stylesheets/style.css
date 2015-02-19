@@ -298,7 +298,7 @@ a,a:visited {
 
 #container {
     width:308px;
-    min-height: 90%;
+    min-height: 93%;
     margin-bottom: 30px;
     padding:20px 0px;
     margin:0 auto;
@@ -443,4 +443,10 @@ small {
 
 .key.As {
     left:81.030303030303%;
+}
+#lefttext{
+    float: left;
+}
+#righttext{
+    float: right;
 }

@@ -58,6 +58,7 @@ $(".bars").bars({
                                 // $('#deck div').css('transform', r);
                                 $('#overlay').css('opacity', pulse.pulse() * 0.1)
                                 //$("#redbar").css('width', pulse.pulse() * 100 + '%');
+                                $("p#lefttext").text('Network Latency: ' + Math.round(pulse.netLatency) + 'ms');
                                 $("p#bpm").text('BPM: ' + Math.round(pulse.bpm));
                                 setTimeout(show, 10);
                             }

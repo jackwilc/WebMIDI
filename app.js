@@ -10,23 +10,25 @@ var MIDI_CONTINUE = 252;
 var clockCount = 0;
 var help = require('midi-help');
 var midi = require('midi'),
-    midiOut = new midi.output();
+    midiOut = new midi.output(),
+    input = new midi.input();
 var devices = [];
-
-// Set up a new input.
-var input = new midi.input();
-
-//Scan for available devices
-for (var i = 0; i < input.getPortCount(); i ++){
-  devices[i] = input.getPortName(i);
-}
-
 //Set up server and socketIO
 var express = require('express')
   , routes = require('./routes')
   , io = require('socket.io');
 var app = module.exports = express.createServer(),
     io = io.listen(app);
+
+//Open available virtual MIDI port
+midiOut.openVirtualPort('');
+
+console.log("midiout: " + midiOut);
+
+//Scan for available input devices
+for (var i = 0; i < input.getPortCount(); i ++){
+  devices[i] = input.getPortName(i);
+}
 
 //Web Server Configuration
 app.configure(function(){
@@ -118,15 +120,7 @@ var midiReceived = function(deltaTime, message){
 
 }
 
-//Open available MIDI port
-try {
-  midiOut.openPort(0);
-} catch(error) {
-  midiOut.openVirtualPort('');
-}
-
-
-//When web socket receives a connection
+//When web socket receives a connection from the browser
 io.sockets.on('connection', function (socket) {
 
   //When xy pad is changed/
@@ -186,7 +180,9 @@ io.sockets.on('connection', function (socket) {
 //Close MIDI port on termination///
 process.on("SIGTERM", function(){
   midiOut.closePort();
+  app.close();
 });
+
 
 // Start Server//////
 app.listen(port);
