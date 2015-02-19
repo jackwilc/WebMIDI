@@ -1,5 +1,5 @@
 //CONFIG
-var port = 80;
+var port = 3000;
 
 //MIDI Variables
 var MIDI_PPQN = 24;
@@ -10,25 +10,23 @@ var MIDI_CONTINUE = 252;
 var clockCount = 0;
 var help = require('midi-help');
 var midi = require('midi'),
-    midiOut = new midi.output(),
-    input = new midi.input();
+    midiOut = new midi.output();
 var devices = [];
+
+// Set up a new input.
+var input = new midi.input();
+
+//Scan for available devices
+for (var i = 0; i < input.getPortCount(); i ++){
+  devices[i] = input.getPortName(i);
+}
+
 //Set up server and socketIO
 var express = require('express')
   , routes = require('./routes')
   , io = require('socket.io');
 var app = module.exports = express.createServer(),
     io = io.listen(app);
-
-//Open available virtual MIDI port
-midiOut.openVirtualPort('');
-
-console.log("midiout: " + midiOut);
-
-//Scan for available input devices
-for (var i = 0; i < input.getPortCount(); i ++){
-  devices[i] = input.getPortName(i);
-}
 
 //Web Server Configuration
 app.configure(function(){
@@ -48,17 +46,12 @@ app.configure('production', function(){
   app.use(express.errorHandler());
 });
 
-// Add Routes
+// Routes
 app.get('/', routes.index);
-app.get('/dial', routes.dial);
-app.get('/bars', routes.bars);
-
-console.log("-----------------------------------------");
-console.log("WEB MIDI");
-console.log("-----------------------------------------");
 
 //If program missing required arguments
 if (process.argv.length < 3){
+  console.log('');
   console.log('Run the server using arguments [device_id] [port]');
   console.log('');
   console.log("The following MIDI devices were detected:");
@@ -77,8 +70,7 @@ if (process.argv.length < 3){
   var deviceID = parseInt(process.argv[2])
 
   if (deviceID >= devices.length){
-    console.log('ERROR: UNKNOWN DEVICE ID');
-    process.exit(0);
+    throw "Device " + deviceID + " unknown."
   }
 
   console.log("Listening to device " + deviceID + ": " + devices[deviceID])
@@ -120,46 +112,21 @@ var midiReceived = function(deltaTime, message){
 
 }
 
-//When web socket receives a connection from the browser
+//Open available MIDI port
+try {
+  midiOut.openPort(0);
+} catch(error) {
+  midiOut.openVirtualPort('');
+}
+
+
+//When web socket receives a connection
 io.sockets.on('connection', function (socket) {
 
   //When xy pad is changed/
   socket.on('notedown',function(data){
     midiOut.sendMessage(help.noteOn(60, data.message));
     midiOut.sendMessage(help.noteOn(61, data.message1));
-    socket.broadcast.emit('playeddown',{'message':data.message});
-  });
-
-  socket.on('dialchange',function(data){
-    midiOut.sendMessage(help.noteOn(62, data.message));
-    socket.broadcast.emit('playeddown',{'message':data.message});
-  });
-
-  socket.on('bar1change',function(data){
-
-    midiOut.sendMessage(help.noteOn(63, data.message));
-
-    socket.broadcast.emit('playeddown',{'message':data.message});
-  });
-
-  socket.on('bar2change',function(data){
-
-    midiOut.sendMessage(help.noteOn(64, data.message));
-
-    socket.broadcast.emit('playeddown',{'message':data.message});
-  });
-
-  socket.on('bar3change',function(data){
-
-    midiOut.sendMessage(help.noteOn(65, data.message));
-
-    socket.broadcast.emit('playeddown',{'message':data.message});
-  });
-
-  socket.on('bar4change',function(data){
-
-    midiOut.sendMessage(help.noteOn(66, data.message));
-
     socket.broadcast.emit('playeddown',{'message':data.message});
   });
 
@@ -180,9 +147,7 @@ io.sockets.on('connection', function (socket) {
 //Close MIDI port on termination///
 process.on("SIGTERM", function(){
   midiOut.closePort();
-  app.close();
 });
-
 
 // Start Server//////
 app.listen(port);
