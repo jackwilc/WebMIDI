@@ -1,5 +1,5 @@
 //$.backstretch("/images/background1.jpg");
-var socket = io.connect('http://192.168.0.3'); // change to appropiate for network access
+//var socket = io.connect('http://localhost'); // change to appropiate for network access
 var $pad = $(".pad")
                             .xy({
                                     displayPrevious:false
@@ -50,8 +50,8 @@ $(".bars").bars({
                                     }
                         });
 
-                             var pulse = new Pulse();
-                             pulse.connect('http://192.168.0.3');
+                             //var pulse = new Pulse();
+                             //pulse.connect('http://localhost');
                              function show(){
                                 // document.getElementById('record').style.transform = 'rotate(' + (pulse.beat() % 1) * 360 + 'deg)';
                                 // var r = 'rotate(' + (pulse.beat() % 8) * 45 + 'deg)';

@@ -13,17 +13,41 @@ var midi = require('midi'),
     midiOut = new midi.output(),
     input = new midi.input();
 var devices = [];
+var os = require('os');
+var ifaces = os.networkInterfaces();
+
 //Set up server and socketIO
 var express = require('express')
   , routes = require('./routes')
   , io = require('socket.io');
 var app = module.exports = express.createServer(),
     io = io.listen(app);
+var serverIP;
+
+//Detect the local IP address of the machine
+Object.keys(ifaces).forEach(function (ifname) {
+  var alias = 0
+    ;
+
+  ifaces[ifname].forEach(function (iface) {
+    if ('IPv4' !== iface.family || iface.internal !== false) {
+      // skip over internal (i.e. 127.0.0.1) and non-ipv4 addresses
+      return;
+    }
+
+    if (alias >= 1) {
+      // this single interface has multiple ipv4 addresses
+      console.log(ifname + ':' + alias, iface.address);
+    } else {
+      // this interface has only one ipv4 adress
+      serverIP = iface.address;
+    }
+  });
+});
+
 
 //Open available virtual MIDI port
-midiOut.openVirtualPort('');
-
-console.log("midiout: " + midiOut);
+midiOut.openVirtualPort('webMIDI');
 
 //Scan for available input devices
 for (var i = 0; i < input.getPortCount(); i ++){
@@ -52,19 +76,22 @@ app.configure('production', function(){
 app.get('/', routes.index);
 app.get('/dial', routes.dial);
 app.get('/bars', routes.bars);
+app.get('/javascripts/socket.js', function (req, res) {
+  res.send('var socket = io.connect("http://' + serverIP + '");var pulse = new Pulse();pulse.connect("http://' + serverIP + '");') 
+})
 
-console.log("-----------------------------------------");
-console.log("WEB MIDI");
-console.log("-----------------------------------------");
+console.log("-------------------------------------------------");
+console.log("WEB MIDI v0.1   [Detected IP: " + serverIP + "]" );
+console.log("-------------------------------------------------");
 
 //If program missing required arguments
 if (process.argv.length < 3){
-  console.log('Run the server using arguments [device_id] [port]');
+  console.log('Run the server using arguments [device_id]');
   console.log('');
   console.log("The following MIDI devices were detected:");
-  console.log("-----------------------------------------");
+  console.log("-------------------------------------------------");
   if (devices.length == 0){
-    console.log("...NO DEVICES DETECTED...");
+    console.log("*** NO DEVICES DETECTED ***");
   } else {
     for (var i = 0; i < devices.length; i ++){
       console.log( "id: " + i + "\t" + devices[i]);
@@ -83,17 +110,24 @@ if (process.argv.length < 3){
 
   console.log("Listening to device " + deviceID + ": " + devices[deviceID])
 
-  io.sockets.on('connection', function (socket) {
+io.sockets.on('connection', function (socket) {
+
     console.log("Client connected.");
+    socket.emit('serverIP',{'message':serverIP});
 
     socket.on('disconnect', function(reason){
+
       console.log("Disconnected: " + reason);
+
     });
 
     socket.on('ping', function(){
       socket.emit('pong');
     });
+
   });
+
+
 var midiReceived = function(deltaTime, message){
     // Throttle the number of clock messages sent.
     // The midi standard of 24 pulses-per-quarter-note 
@@ -179,8 +213,10 @@ io.sockets.on('connection', function (socket) {
 
 //Close MIDI port on termination///
 process.on("SIGTERM", function(){
+
   midiOut.closePort();
   app.close();
+
 });
 
 
