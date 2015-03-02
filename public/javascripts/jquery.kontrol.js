@@ -152,7 +152,7 @@
 
             (!this.o.displayInput) && this.$.hide();
 
-            this.$c = $('<canvas width="' +
+            this.$c = $('<canvas id="xy" width="' +
                             this.o.width + 'px" height="' +
                             this.o.height + 'px"></canvas>');
             this.c = this.$c[0].getContext("2d");
@@ -195,6 +195,9 @@
 
             c.width = s.o.width;
             c.height = s.o.height;
+            
+
+
             s.g = c.getContext('2d');
 
             s.clear();
@@ -338,6 +341,26 @@
                         , function (e) {
                             e.preventDefault();
                             s._xy()._mouse(e);
+                            socket.emit('fx_on',{value: true});
+                        
+                         }
+                    )
+                    .bind(
+                        "touchend"
+                        , function (e) {
+                            socket.emit('fx_on',{value: false});
+                         }
+                    )
+                    .bind(
+                        "mouseup"
+                        , function (e) {
+                            socket.emit('fx_on',{value: false});
+                         }
+                    )
+                    .bind(
+                        "touchcancel"
+                        , function (e) {
+                            socket.emit('fx_on',{value: false});
                          }
                     )
                     .bind(
@@ -345,6 +368,7 @@
                         , function (e) {
                             e.preventDefault();
                             s._xy()._touch(e);
+                            socket.emit('fx_on',{value: true});
                          }
                     );
                 this.listen();
@@ -706,8 +730,8 @@
                 {
                     min : this.$.data('min') || 0,
                     max : this.$.data('max') || 100,
-                    width : this.$.data('width') || 200,
-                    height : this.$.data('height') || 200
+                    width : $(window).width() || 200,
+                    height : $(window).width() || 200
                 }, this.o
             );
         };

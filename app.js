@@ -15,6 +15,7 @@ var midi = require('midi'),
 var devices = [];
 var os = require('os');
 var ifaces = os.networkInterfaces();
+var storage = require('node-persist');
 
 //Set up server and socketIO
 var express = require('express')
@@ -22,7 +23,12 @@ var express = require('express')
   , io = require('socket.io');
 var app = module.exports = express.createServer(),
     io = io.listen(app);
-var serverIP;
+var serverIP = "127.0.0.1";
+var connect = false;
+var disconnect = false;
+var traktorPort = null;
+var fx = 1;
+var server;
 
 //Detect the local IP address of the machine
 Object.keys(ifaces).forEach(function (ifname) {
@@ -35,24 +41,21 @@ Object.keys(ifaces).forEach(function (ifname) {
       return;
     }
 
-    if (alias >= 1) {
-      // this single interface has multiple ipv4 addresses
-      console.log(ifname + ':' + alias, iface.address);
-    } else {
-      // this interface has only one ipv4 adress
       serverIP = iface.address;
-    }
+      
   });
 });
 
-
-//Open available virtual MIDI port
-midiOut.openVirtualPort('webMIDI');
+storage.initSync();
+fx = storage.getItem('fx');
 
 //Scan for available input devices
 for (var i = 0; i < input.getPortCount(); i ++){
   devices[i] = input.getPortName(i);
 }
+
+//Open virtual MIDI port
+midiOut.openVirtualPort('webMIDI');
 
 //Web Server Configuration
 app.configure(function(){
@@ -77,11 +80,12 @@ app.get('/', routes.index);
 app.get('/dial', routes.dial);
 app.get('/bars', routes.bars);
 app.get('/javascripts/socket.js', function (req, res) {
-  res.send('var socket = io.connect("http://' + serverIP + '");var pulse = new Pulse();pulse.connect("http://' + serverIP + '");') 
+  res.setHeader("Content-Type", "text/javascript");
+  res.send('var socket = io.connect("http://' + serverIP + '");var pulse = new Pulse();pulse.connect("http://' + serverIP + '");var flashing = '+ storage.getItem('flashing') +';$("#fx' + fx + '").css("background-color", "#F5A91D");var touchxy = false;') 
 })
 
 console.log("-------------------------------------------------");
-console.log("WEB MIDI v0.1   [Detected IP: " + serverIP + "]" );
+console.log("   WEB MIDI v0.1   [Detected IP: " + serverIP + "]" );
 console.log("-------------------------------------------------");
 
 //If program missing required arguments
@@ -95,6 +99,9 @@ if (process.argv.length < 3){
   } else {
     for (var i = 0; i < devices.length; i ++){
       console.log( "id: " + i + "\t" + devices[i]);
+      if(devices[i] == "Traktor Virtual Output"){
+        console.log("Traktor Output Detected!");
+      }
     }
   }
   console.log('');
@@ -111,13 +118,27 @@ if (process.argv.length < 3){
   console.log("Listening to device " + deviceID + ": " + devices[deviceID])
 
 io.sockets.on('connection', function (socket) {
-
+    if(!connect){
     console.log("Client connected.");
+    connect = true;
+    }
+  else
+  {
+    connect = false;
+  }
     socket.emit('serverIP',{'message':serverIP});
 
     socket.on('disconnect', function(reason){
-
+      
+      if(!disconnect){
       console.log("Disconnected: " + reason);
+      disconnect = true;
+      }
+      else
+      {
+      disconnect = false;
+      }
+      
 
     });
 
@@ -159,42 +180,57 @@ io.sockets.on('connection', function (socket) {
 
   //When xy pad is changed/
   socket.on('notedown',function(data){
-    midiOut.sendMessage(help.noteOn(60, data.message));
-    midiOut.sendMessage(help.noteOn(61, data.message1));
-    socket.broadcast.emit('playeddown',{'message':data.message});
+    midiOut.sendMessage(help.noteOn(60 + (10 * (fx - 1)), data.message));
+    midiOut.sendMessage(help.noteOn(61 + (10 * (fx - 1)), data.message1));
+    //console.log('Midi out CH' + (60 + (10 * (fx - 1))) + "FX = " + fx);
   });
 
   socket.on('dialchange',function(data){
-    midiOut.sendMessage(help.noteOn(62, data.message));
+    midiOut.sendMessage(help.noteOn(62 + (10 * (fx - 1)), data.message));
     socket.broadcast.emit('playeddown',{'message':data.message});
   });
 
   socket.on('bar1change',function(data){
 
-    midiOut.sendMessage(help.noteOn(63, data.message));
+    midiOut.sendMessage(help.noteOn(63 + (10 * (fx - 1)), data.message));
 
     socket.broadcast.emit('playeddown',{'message':data.message});
   });
 
   socket.on('bar2change',function(data){
 
-    midiOut.sendMessage(help.noteOn(64, data.message));
+    midiOut.sendMessage(help.noteOn(64 + (10 * (fx - 1)), data.message));
 
     socket.broadcast.emit('playeddown',{'message':data.message});
   });
 
   socket.on('bar3change',function(data){
 
-    midiOut.sendMessage(help.noteOn(65, data.message));
+    midiOut.sendMessage(help.noteOn(65 + (10 * (fx - 1)), data.message));
 
     socket.broadcast.emit('playeddown',{'message':data.message});
   });
 
   socket.on('bar4change',function(data){
 
-    midiOut.sendMessage(help.noteOn(66, data.message));
+    midiOut.sendMessage(help.noteOn(66 + (10 * (fx - 1)), data.message));
 
     socket.broadcast.emit('playeddown',{'message':data.message});
+  });
+
+  socket.on('setting_flashing',function(data){
+
+    storage.setItem('flashing', data.message);
+
+  });
+
+  socket.on('change_fx',function(data){
+
+    console.log(data.number);
+    fx = data.number;
+    storage.setItem('fx', data.number);
+    socket.emit('change_fx',{'number':data.number});
+
   });
 
   // note stop
@@ -209,16 +245,38 @@ io.sockets.on('connection', function (socket) {
     midiOut.sendMessage([message,0,0]);
   });
 
+  socket.on('fx_on',function(data){
+
+    notevalue = 58 + (10 * (fx - 1));
+
+    if(data.value){
+
+    midiOut.sendMessage(help.noteOn(notevalue, 127));
+  }else{
+
+      midiOut.sendMessage(help.noteOn(notevalue + 1, 127));
+  }
+
+  });
+
+  socket.on('screenheight',function(data){
+    console.log(data.height);
+  });
+
 });
 
 //Close MIDI port on termination///
 process.on("SIGTERM", function(){
 
   midiOut.closePort();
-  app.close();
+  server.close();
 
 });
 
 
 // Start Server//////
-app.listen(port);
+try{
+server = app.listen(port);
+} catch(er) {
+  console.log("ERROR! Server could not listen on port " + port + ". Please check that webMIDI is not already running.");
+}
