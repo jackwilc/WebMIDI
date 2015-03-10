@@ -724,14 +724,21 @@
         this.cursor = 0;
         this.v = {};
         this.div = null;
+        var widthxy = $(window).width();
+
+        if(widthxy > 500){
+            widthxy = 500;
+        }
+
+        console.log("widthxy:" + widthxy);
 
         this.extend = function () {
             this.o = $.extend(
                 {
                     min : this.$.data('min') || 0,
                     max : this.$.data('max') || 100,
-                    width : $(window).width() || 200,
-                    height : $(window).width() || 200
+                    width : widthxy || 200,
+                    height : widthxy || 200
                 }, this.o
             );
         };

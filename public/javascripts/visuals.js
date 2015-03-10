@@ -25,11 +25,19 @@ var canvas = document.getElementById("xy"),
 
 // Set the canvas to occupy FULL space. We want our creation
 // to rule, don't we?
-canvas.width = 300;
-canvas.height = 300;
 
-canvas.width = $(window).width();
-canvas.height = $(window).width();
+
+if($(window).width() > 500){
+	canvas.width = 500;
+	canvas.height = 500;
+}else{
+	canvas.width = $(window).width();
+	canvas.height = $(window).width();
+}
+
+
+
+
 
 canvas.addEventListener("touchstart",mouseDown, false);
 canvas.addEventListener("touchmove",touchXY, false);

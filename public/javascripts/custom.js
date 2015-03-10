@@ -199,7 +199,11 @@ $('#effectstoggle').on('toggle', function (e, active) {
     $('#xy').hide();
   } 
 });
-$( ".container" ).css( "width", $(window).width());
+if($(window).width() > 500){
+    $( ".container" ).css( "width", 500);
+  }else{
+    $( ".container" ).css( "width", $(window).width());
+  }
 $( ".container" ).css( "height" , $(window).height() - 30);
 $( window ).resize(function() {
   $( ".container" ).css( "height" , $(window).height() - 30);

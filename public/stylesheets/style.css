@@ -29,8 +29,39 @@ padding-right: 10px;
 padding-top: 7px;
 }
 
+.quartbutton {
+    margin-top: 10px;
+    float: left;
+    width: 22%;
+    text-align: center;
+    vertical-align: middle;
+    height: 100%;
+    height: 50px;
+    border: 2px solid #fff;
+    line-height: 50px;
+    cursor: pointer;
+}
 
 .fxbuttons{
+    float: left;
+    width: 48%;
+    text-align: center;
+    vertical-align: middle;
+    height: 100%;
+    height: 50px;
+    border: 2px solid #fff;
+    line-height: 50px;
+    cursor: pointer;
+}
+
+.buttonspacer{
+    width:2%;
+    float:left;
+    height: 50px;
+}
+
+.halfbutton{
+    margin-top: 10px;
     float: left;
     width: 48%;
     text-align: center;
