@@ -8,6 +8,115 @@
     display: none;
 }
 
+<<<<<<< HEAD
+=======
+.settingsbutton{
+    z-index: 11;
+}
+
+#xy{
+    -webkit-filter: blur(5px);
+  -moz-filter: blur(5px);
+  -o-filter: blur(5px);
+  -ms-filter: blur(5px);
+  filter: blur(5px);
+}
+
+.innerpadding{
+    padding-left: 10px;
+padding-right: 10px;
+padding-top: 7px;
+}
+
+.quartbutton {
+    margin-top: 10px;
+    float: left;
+    width: 22%;
+    text-align: center;
+    vertical-align: middle;
+    height: 100%;
+    height: 50px;
+    border: 2px solid #fff;
+    line-height: 50px;
+    cursor: pointer;
+}
+
+.fxbuttons{
+    float: left;
+    width: 48%;
+    text-align: center;
+    vertical-align: middle;
+    height: 100%;
+    height: 50px;
+    border: 2px solid #fff;
+    line-height: 50px;
+    cursor: pointer;
+}
+
+.buttonspacer{
+    width:2%;
+    float:left;
+    height: 50px;
+}
+
+.halfbutton{
+    margin-top: 10px;
+    float: left;
+    width: 48%;
+    text-align: center;
+    vertical-align: middle;
+    height: 100%;
+    height: 50px;
+    border: 2px solid #fff;
+    line-height: 50px;
+    cursor: pointer;
+}
+
+.menubutton{
+    text-transform:uppercase;
+    margin-top: 5px;
+    width: 70px;
+    text-align: center;
+    vertical-align: middle;
+    height: 50px;
+    border: 2px solid #fff;
+    display: inline-block;
+    line-height: 50px;
+}
+
+#buttongroup{
+    display: inline-block;
+    z-index: 11;
+}
+
+#fx1{
+    float: left;
+}
+#fx2{
+    float: right;
+}
+
+.clear { clear: both; }
+
+#settings{
+    width: 100%;
+    height: 100%;
+    position: fixed;
+    z-index: 10;
+    background: #262626;
+    display: none;
+}
+
+#settings>p{
+    float: left;
+}
+
+#footerbtn{
+    width: 100%;
+    z-index: 11;
+}
+
+>>>>>>> parent of 8995ef9... Multiple Updates
 article, aside, details, figcaption, figure, footer, 
 header, hgroup, nav, section, summary{
  display:block}
@@ -293,12 +402,81 @@ a,a:visited {
     color:gold;
 }
 
+<<<<<<< HEAD
 #container {
+=======
+.settingsitem{
+    width: 100%;
+    float: left;
+    background-color: #222222;
+    display: inline-block;
+    height: 50px;
+    vertical-align: middle;
+}
+.settingsitem>p{
+    padding-left: 18px;
+    width: 220px;
+    float:left;
+    margin-top: 16px;
+}
+.settingsitem>div{
+    float:left;
+    margin-top: 15px;
+}
+
+.tabs{
+    width: 100%;
+    list-style-type: none;
+}
+
+.tabs>li{
+    float:left;
+    border: 2px solid #fff;
+    padding-left: 5px;
+    padding-right: 5px;
+    margin-left: 5px;
+    margin-right: 5px;
+}
+.activetab{
+    background-color: #F5A91D;
+}
+.tabs>li>a>img{
+    width:32px;
+    height: 32px;
+    padding: 8px;
+
+}
+
+.container {
+>>>>>>> parent of 8995ef9... Multiple Updates
     width:308px;
     padding:20px 0px;
     margin:0 auto;
 }
 
+<<<<<<< HEAD
+=======
+.container:after {
+  content: "";
+  display: block;
+}
+
+.site-footer, .container:after{
+
+  height: 30px; 
+}
+
+.site-footer{
+    font-size: 10px;
+    width: 300px;
+    margin-left: auto;
+    margin-right: auto;
+    margin-top: -40px;
+    text-align: center;
+}
+
+
+>>>>>>> parent of 8995ef9... Multiple Updates
 #controller {
     display: none;
 }
@@ -377,6 +555,7 @@ small {
     cursor: pointer;
     box-shadow:0 2px 3px rgba(0,0,0,0.3);
 }
+<<<<<<< HEAD
 
 .key {
     width:14.090909090909%;
@@ -419,3 +598,5 @@ small {
 .key.As {
     left:81.030303030303%;
 }
+=======
+>>>>>>> parent of 8995ef9... Multiple Updates

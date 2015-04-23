@@ -27,6 +27,42 @@ var express = require('express')
   , io = require('socket.io');
 var app = module.exports = express.createServer(),
     io = io.listen(app);
+<<<<<<< HEAD
+=======
+var serverIP = "127.0.0.1";
+var connect = false;
+var disconnect = false;
+var traktorPort = null;
+var fx = 1;
+var server;
+
+//Detect the local IP address of the machine
+Object.keys(ifaces).forEach(function (ifname) {
+  var alias = 0
+    ;
+
+  ifaces[ifname].forEach(function (iface) {
+    if ('IPv4' !== iface.family || iface.internal !== false) {
+      // skip over internal (i.e. 127.0.0.1) and non-ipv4 addresses
+      return;
+    }
+
+      serverIP = iface.address;
+      
+  });
+});
+
+storage.initSync();
+fx = storage.getItem('fx');
+
+//Scan for available input devices
+for (var i = 0; i < input.getPortCount(); i ++){
+  devices[i] = input.getPortName(i);
+}
+
+//Open virtual MIDI port
+midiOut.openVirtualPort('webMIDI');
+>>>>>>> parent of 8995ef9... Multiple Updates
 
 //Web Server Configuration
 app.configure(function(){
@@ -50,6 +86,13 @@ app.configure('production', function(){
 app.get('/', routes.index);
 app.get('/dial', routes.dial);
 app.get('/bars', routes.bars);
+<<<<<<< HEAD
+=======
+app.get('/javascripts/socket.js', function (req, res) {
+  res.setHeader("Content-Type", "text/javascript");
+  res.send('var socket = io.connect("http://' + serverIP + '");var pulse = new Pulse();pulse.connect("http://' + serverIP + '");var flashing = '+ storage.getItem('flashing') +';$("#fx' + fx + '").css("background-color", "#F5A91D");var touchxy = false;') 
+})
+>>>>>>> parent of 8995ef9... Multiple Updates
 
 console.log("-----------------------------------------");
 console.log("WEB MIDI");
@@ -131,6 +174,7 @@ io.sockets.on('connection', function (socket) {
 
   //When xy pad is changed/
   socket.on('notedown',function(data){
+<<<<<<< HEAD
     midiOut.sendMessage(help.noteOn(60, data.message));
     midiOut.sendMessage(help.noteOn(61, data.message1));
     socket.broadcast.emit('playeddown',{'message':data.message});
@@ -146,6 +190,61 @@ io.sockets.on('connection', function (socket) {
     socket.broadcast.emit('playeddown',{'message':data.message});
   });
 
+=======
+    midiOut.sendMessage(help.noteOn(60 + (10 * (fx - 1)), data.message));
+    midiOut.sendMessage(help.noteOn(61 + (10 * (fx - 1)), data.message1));
+    //console.log('Midi out CH' + (60 + (10 * (fx - 1))) + "FX = " + fx);
+  });
+
+  socket.on('dialchange',function(data){
+    midiOut.sendMessage(help.noteOn(62 + (10 * (fx - 1)), data.message));
+    socket.broadcast.emit('playeddown',{'message':data.message});
+  });
+
+  socket.on('bar1change',function(data){
+
+    midiOut.sendMessage(help.noteOn(63 + (10 * (fx - 1)), data.message));
+
+    socket.broadcast.emit('playeddown',{'message':data.message});
+  });
+
+  socket.on('bar2change',function(data){
+
+    midiOut.sendMessage(help.noteOn(64 + (10 * (fx - 1)), data.message));
+
+    socket.broadcast.emit('playeddown',{'message':data.message});
+  });
+
+  socket.on('bar3change',function(data){
+
+    midiOut.sendMessage(help.noteOn(65 + (10 * (fx - 1)), data.message));
+
+    socket.broadcast.emit('playeddown',{'message':data.message});
+  });
+
+  socket.on('bar4change',function(data){
+
+    midiOut.sendMessage(help.noteOn(66 + (10 * (fx - 1)), data.message));
+
+    socket.broadcast.emit('playeddown',{'message':data.message});
+  });
+
+  socket.on('setting_flashing',function(data){
+
+    storage.setItem('flashing', data.message);
+
+  });
+
+  socket.on('change_fx',function(data){
+
+    console.log(data.number);
+    fx = data.number;
+    storage.setItem('fx', data.number);
+    socket.emit('change_fx',{'number':data.number});
+
+  });
+
+>>>>>>> parent of 8995ef9... Multiple Updates
   // note stop
   socket.on('noteup',function(data){
     midiOut.sendMessage([128,data.message,100]);
@@ -158,6 +257,27 @@ io.sockets.on('connection', function (socket) {
     midiOut.sendMessage([message,0,0]);
   });
 
+<<<<<<< HEAD
+=======
+  socket.on('fx_on',function(data){
+
+    notevalue = 58 + (10 * (fx - 1));
+
+    if(data.value){
+
+    midiOut.sendMessage(help.noteOn(notevalue, 127));
+  }else{
+
+      midiOut.sendMessage(help.noteOn(notevalue + 1, 127));
+  }
+
+  });
+
+  socket.on('screenheight',function(data){
+    console.log(data.height);
+  });
+
+>>>>>>> parent of 8995ef9... Multiple Updates
 });
 
 //Close MIDI port on termination///

@@ -152,7 +152,11 @@
 
             (!this.o.displayInput) && this.$.hide();
 
+<<<<<<< HEAD
             this.$c = $('<canvas width="' +
+=======
+            this.$c = $('<canvas id="xy" width="' +
+>>>>>>> parent of 8995ef9... Multiple Updates
                             this.o.width + 'px" height="' +
                             this.o.height + 'px"></canvas>');
             this.c = this.$c[0].getContext("2d");
@@ -338,6 +342,29 @@
                         , function (e) {
                             e.preventDefault();
                             s._xy()._mouse(e);
+<<<<<<< HEAD
+=======
+                            socket.emit('fx_on',{value: true});
+                        
+                         }
+                    )
+                    .bind(
+                        "touchend"
+                        , function (e) {
+                            socket.emit('fx_on',{value: false});
+                         }
+                    )
+                    .bind(
+                        "mouseup"
+                        , function (e) {
+                            socket.emit('fx_on',{value: false});
+                         }
+                    )
+                    .bind(
+                        "touchcancel"
+                        , function (e) {
+                            socket.emit('fx_on',{value: false});
+>>>>>>> parent of 8995ef9... Multiple Updates
                          }
                     )
                     .bind(
@@ -345,6 +372,10 @@
                         , function (e) {
                             e.preventDefault();
                             s._xy()._touch(e);
+<<<<<<< HEAD
+=======
+                            socket.emit('fx_on',{value: true});
+>>>>>>> parent of 8995ef9... Multiple Updates
                          }
                     );
                 this.listen();
@@ -700,6 +731,16 @@
         this.cursor = 0;
         this.v = {};
         this.div = null;
+<<<<<<< HEAD
+=======
+        var widthxy = $(window).width();
+
+        if(widthxy > 500){
+            widthxy = 500;
+        }
+
+        console.log("widthxy:" + widthxy);
+>>>>>>> parent of 8995ef9... Multiple Updates
 
         this.extend = function () {
             this.o = $.extend(

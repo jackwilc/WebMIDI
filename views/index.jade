@@ -1,4 +1,5 @@
 div#overlay
+<<<<<<< HEAD
 #container
     
     
@@ -20,6 +21,54 @@ div#overlay
 
 
 script(type="text/javascript", src="/javascripts/jquery.min.js")
+=======
+div#lc 
+    img(src="/images/load.gif")
+    p LOOKING FOR SERVER
+.container
+    div#tab1
+        fieldset.pad(data-width='300' data-height='300')
+                    input(name='x' value='27')
+                    input(name='y' value='80')
+        div.innerpadding
+            p#bpm
+            div#fxselect
+                div.fxbuttons#fx1 FX1
+                div.fxbuttons#fx2 FX2
+    div#tab2
+        div.halfbutton LOOP IN
+        div.buttonspacer
+        div.halfbutton LOOP OUT
+        div.quartbutton 4
+        div.buttonspacer
+        div.quartbutton 8
+        div.buttonspacer
+        div.quartbutton 16
+        div.buttonspacer
+        div.quartbutton 32
+    div#tab3 
+        div.settingsitem 
+            p Pulse Background
+            div#flashingtoggle.toggle-soft
+        div.settingsitem 
+            p Touch Effects
+            div#effectstoggle.toggle-soft
+footer.site-footer
+    div#buttongroup
+        ul.tabs
+            li
+                a(href="#tab1")
+                    img(src="/images/browse.png")
+            li
+                a(href="#tab2") 
+                    img(src="/images/loops.png")
+            li
+                a(href="#tab3") 
+                    img(src="/images/settings.png")
+script(type="text/javascript", src="/javascripts/jquery.min.js")
+script(type="text/javascript", src="/javascripts/pulse.js")
+script(type="text/javascript", src="/javascripts/socket.js")
+>>>>>>> parent of 8995ef9... Multiple Updates
 script(type="text/javascript", src="/javascripts/jquery.kontrol.js")
 script(type="text/javascript", src="/javascripts/pulse.js")
 script(type="text/javascript", src="/javascripts/custom.js")
