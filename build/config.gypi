@@ -19,7 +19,7 @@
     "icu_small": "true",
     "icu_ver_major": "54",
     "node_install_npm": "true",
-    "node_prefix": "/",
+    "node_prefix": "",
     "node_shared_cares": "false",
     "node_shared_http_parser": "false",
     "node_shared_libuv": "false",

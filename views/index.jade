@@ -1,80 +1,25 @@
 div#overlay
-div#lc 
-    img(src="/images/load.gif")
-    p LOOKING FOR SERVER
-.container
-    div#tab1
-        div.fieldsetcontainer
-            fieldset.pad(data-width='300' data-height='300')
+#container
+    
+    
+        fieldset.pad(data-width='300' data-height='300')
                     input(name='x' value='27')
                     input(name='y' value='80')
-        div.halfbutton#fx1 FX 1
-        div.buttonspacer
-        div.halfbutton#fx2 FX 2
-        div.halfbutton#fx3 FX 3
-        div.buttonspacer#lower
-        div.halfbutton#fx4 FX 4
-    div#tab2
-        div.halfbutton#halfloop /2
-        div.buttonspacer
-        div.halfbutton#doubleloop x2
-        div.buttonrow
-            div.quartbutton#quart 1/4
-            div.buttonspacer
-            div.quartbutton#half 1/2
-            div.buttonspacer
-            div.quartbutton#1 1
-            div.buttonspacer
-            div.quartbutton#2 2
-        div.buttonrow
-            div.quartbutton#4 4
-            div.buttonspacer
-            div.quartbutton#8 8
-            div.buttonspacer
-            div.quartbutton#16 16
-            div.buttonspacer
-            div.quartbutton#32 32
-        div.seek
-        div.halfbutton#deck1 DECK A
-        div.buttonspacer
-        div.halfbutton#deck2 DECK B
-        fieldset.trackseek(data-width='300' data-height='100')
-                    input(name='x' value='27')
-                    input(name='y' value='80')
-    div#tab3 
-        div.settingsitem 
-            p Pulse Background
-            div#flashingtoggle.toggle-soft
-        div.settingsitem 
-            p Touch Effects
-            div#effectstoggle.toggle-soft
-        div.settingsitem 
-            p 4 FX Units
-            div#fxtoggle.toggle-soft
-        div.settingtext#latency Network Latency: 23ms
-        div.settingtext#latency webMIDI V0.9
-    div#tab4
-        div.swipearea
-footer.site-footer
-    div#buttongroup
-        ul.tabs
-            li.footerbuttons
-                a(href="#tab1")
-                    img(src="/images/browse.png")
-            li.footerbuttons
-                a(href="#tab2") 
-                    img(src="/images/loops.png")
-            li.footerbuttons
-                a(href="#tab4") 
-                    img(src="/images/list.png")
-            li.footerbuttons
-                a(href="#tab3") 
-                    img(src="/images/settings.png")
+            div#redbar
+        p#bpm
+        p
+            a(href="/")
+                XY XY PAD
+            &nbsp;&#124;&nbsp;
+            a(href="/dial")
+                XY DIAL
+            &nbsp;&#124;&nbsp;
+            a(href="/bars")
+                XY BARS
+
+
+
 script(type="text/javascript", src="/javascripts/jquery.min.js")
-script(type="text/javascript", src="/javascripts/jquery.touchSwipe.min.js")
-script(type="text/javascript", src="/javascripts/pulse.js")
-script(type="text/javascript", src="/javascripts/socket.js")
 script(type="text/javascript", src="/javascripts/jquery.kontrol.js")
-script(type="text/javascript", src="/javascripts/toggles.min.js")
+script(type="text/javascript", src="/javascripts/pulse.js")
 script(type="text/javascript", src="/javascripts/custom.js")
-script(type="text/javascript", src="/javascripts/visuals.js")
