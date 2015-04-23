@@ -1,21 +1,65 @@
-//$.backstretch("/images/background1.jpg");
-//var socket = io.connect('http://localhost'); // change to appropiate for network access
 touchxy = true;
 numtouches = 0;
+var ntouches = 0;
+var oldx = 0;
+var oldy = 0;
+var oldxx = 0;
+var oldyy = 0;
+var olddistance = 0;
+var supportsVibrate = "vibrate" in navigator;
+
 var $pad = $(".pad")
+
                             .xy({
                                     displayPrevious:false
                                     , min : 0
                                     , max : 127
+                                    , stretch: true
                                     , cursor: 1
                                     , fgColor:"#fff"
                                     , bgColor:"#EEEEEE"
                                     , change : function (value) {
+                                          
+                                          console.log('yo' + value['touches']);
+
                                         //console.log("change : ", value);
-                                        socket.emit('notedown',{message: value[0], message1: value[1]});
+                                        if(value['touches'] != 2){
+                                          socket.emit('notedown',{message: value[0], message1: value[1]});
+                                        }else{
+                                          socket.emit('trackseek',{message: value[0]});
+                                        }
+                                        
                                     }
                                 })
                             .css({'border':'0px dashed #fff'});
+
+
+$( "#xy" ).bind( "touchmove", function(e) {
+  console.log('TOUCHES' + e.originalEvent.touches.length);
+  ntouches = e.originalEvent.touches.length;
+});
+
+seek = true;
+var $pad = $(".trackseek")
+                            .xy({
+                                    displayPrevious:false
+                                    , min : 0
+                                    , max : 126
+                                    , stretch: true
+                                    , cursor: 20
+                                    , fgColor:"#fff"
+                                    , bgColor:"#000000"
+                                    , change : function (value) {
+                                        //console.log("change : ", value);
+
+                                        socket.emit('trackseek',{message: value[0]});
+                                        
+                                    }
+                                })
+                            .css({'border-top':'1px dashed #fff','border-bottom':'1px dashed #fff'}); 
+
+
+
 
 var dial = $(".dial")
                     .dial({
@@ -26,8 +70,8 @@ var dial = $(".dial")
                             , cursor: 50
                             , flatMouse: true
                             , change : function (value) {
-                                        //console.log("change : ", value);
-                                        socket.emit('dialchange',{message: value});
+                                        console.log("change : ", value);
+                                        socket.emit('dialchange' , { message: value });
                                     }
                         })
                     .css({display:'inline'});
@@ -70,7 +114,7 @@ $(".bars").bars({
 
 
                                 //$("#redbar").css('width', pulse.pulse() * 100 + '%');
-                                $("p#lefttext").text('Network Latency: ' + Math.round(pulse.netLatency) + 'ms');
+                                $("#latency").text('Network Latency: ' + Math.round(pulse.netLatency) + 'ms');
                                 $("p#bpm").text('BPM: ' + Math.round(pulse.bpm));
                                 setTimeout(show, 100);
                             }
@@ -115,14 +159,88 @@ $( ".flashingbutton" ).click(function() {
 });
 
 $( "#fx1" ).click(function() {
-    $("#fx1").css("background-color", "#F5A91D");
-    $("#fx2").css("background-color", "#262626");
+    $("#fx1").addClass('active');
+    $("#fx2").removeClass('active');
     socket.emit('change_fx',{number: 1});
 });
 $( "#fx2" ).click(function() {
-    $("#fx2").css("background-color", "#F5A91D");
-    $("#fx1").css("background-color", "#262626");
+    $("#fx2").addClass('active');
+    $("#fx1").removeClass('active');
     socket.emit('change_fx',{number: 2});
+});
+
+$( "#halfloop" ).click(function() {
+    socket.emit('halfloop');
+});
+$( "#doubleloop" ).click(function() {
+
+    socket.emit('doubleloop');
+});
+
+$( "#hc1d1" ).click(function() {
+
+    socket.emit('hc1d1');
+});
+
+$( "#hc1d2" ).click(function() {
+
+    socket.emit('hc1d2');
+});
+
+$( "#hc2d1" ).click(function() {
+
+    socket.emit('hc2d1');
+});
+
+$( "#hc2d2" ).click(function() {
+
+    socket.emit('hc2d2');
+});
+
+$( "#deck1" ).click(function() {
+    $("#deck1").addClass('active');
+    $("#deck2").removeClass('active');
+    socket.emit('change_deck',{number: 1});
+});
+$( "#deck2" ).click(function() {
+    $("#deck2").addClass('active');
+    $("#deck1").removeClass('active');
+    socket.emit('change_deck',{number: 2});
+});
+
+$( "#quart" ).click(function() {
+    socket.emit('loop',{length: 0.25});
+});
+
+$( "#half" ).click(function() {
+    socket.emit('loop',{length: 0.5});
+});
+
+$( "#1" ).click(function() {
+    socket.emit('loop',{length: 1});
+});
+
+$( "#2" ).click(function() {
+    socket.emit('loop',{length: 2});
+});
+
+$( "#4" ).click(function() {
+    socket.emit('loop',{length: 4});
+});
+
+$( "#8" ).click(function() {
+
+    socket.emit('loop',{length: 8});
+});
+
+$( "#16" ).click(function() {
+
+    socket.emit('loop',{length: 16});
+});
+
+$( "#32" ).click(function() {
+
+    socket.emit('loop',{length: 32});
 });
 
 socket.on('change_fx',function(data){
@@ -168,6 +286,7 @@ $('ul.tabs').each(function(){
       e.preventDefault();
     });
   });
+$('#fxtoggle').toggles({ });
 if(flashing){
 $('#flashingtoggle').toggles({ on: true });
 } else {
@@ -180,11 +299,9 @@ $('#effectstoggle').toggles({ on: true });
 }
 $('#flashingtoggle').on('toggle', function (e, active) {
   if (active) {
-    console.log('active!');
     socket.emit('setting_flashing',{message: true});
     flashing = true;
   } else {
-    console.log('not active');
     socket.emit('setting_flashing',{message: false});
     $('#overlay').css('opacity', 0);
     flashing = false;
@@ -199,12 +316,154 @@ $('#effectstoggle').on('toggle', function (e, active) {
     $('#xy').hide();
   } 
 });
+
+var newwidth;
+
 if($(window).width() > 500){
-    $( ".container" ).css( "width", 500);
-  }else{
-    $( ".container" ).css( "width", $(window).width());
-  }
-$( ".container" ).css( "height" , $(window).height() - 30);
+  newwidth = 500;
+}else{
+  newwidth = $(window).width();
+}
+
+if($(window).height() < newwidth + 128 + 65){
+  $( "#fx3" ).hide();
+  $( "#fx4" ).hide();
+  $( "#lower" ).hide();
+}
+
+if($(window).height() > 500){
+
+}
+
+
+    $( ".container" ).css( "width", newwidth);
+    $( ".quartbutton" ).css( "width", ((newwidth/4) - 10));
+    $( ".halfbutton" ).css( "width", ((newwidth/2) - 8));
+    $( ".footerbuttons" ).css( "width", ((newwidth/4 - 12)));
+    $( ".site-footer" ).css( "width", newwidth);
+    $( "#buttongroup" ).css( "width", newwidth);
+  
+$( ".container" ).css( "height" , $(window).height() - 65);
+$( ".swipearea" ).css( "height" , $(window).height() - 30);
 $( window ).resize(function() {
-  $( ".container" ).css( "height" , $(window).height() - 30);
+  $( ".container" ).css( "height" , $(window).height() - 65);
 });
+
+$(".swipearea").swipe( {
+
+        tap:function(event, target) {
+          socket.emit('browser');
+        },
+
+        swipeLeft:function(event, direction, distance, duration, fingerCount) {
+          socket.emit('loada');
+          navigator.vibrate(300);
+        },
+
+        swipeRight:function(event, direction, distance, duration, fingerCount) {
+          socket.emit('loadb'); 
+          navigator.vibrate(300);
+        },
+        
+
+        swipeStatus:function(event, phase, direction, distance, duration, fingers)
+        {
+
+  
+          
+
+          var newdistance; 
+
+        
+
+
+
+          
+          var str = "<h4>Swipe Phase : " + phase + "<br/>";
+          str += "Direction from inital touch: " + direction + "<br/>";
+          str += "Distance from inital touch: " + distance + "<br/>";
+          str += "Duration of swipe: " + duration + "<br/>";
+          str += "Fingers used: " + fingers + "<br/></h4>";
+
+
+          newdistance = distance / 40;
+
+          newdistance = Math.floor(newdistance);
+
+          str += "5distance " + newdistance + "<br/></h4>";
+
+          direction = direction;
+
+          if(direction == null){
+            olddistance = 0;
+          }
+
+          if(direction=="down"){
+            if(newdistance >= olddistance + 1){
+            olddistance = newdistance;
+            socket.emit('menuup');
+          }
+
+          if(newdistance <= olddistance - 1){
+            olddistance = newdistance;
+            socket.emit('menudown');
+          }
+          }
+
+          if(direction=="up"){
+            if(newdistance >= olddistance + 1){
+            olddistance = newdistance;
+            socket.emit('menudown');
+          }
+
+          if(newdistance <= olddistance - 1){
+            olddistance = newdistance;
+            socket.emit('menuup');
+          }
+          }
+          
+
+
+          
+
+        
+
+
+
+          //Here we can check the:
+          //phase : 'start', 'move', 'end', 'cancel'
+          //direction : 'left', 'right', 'up', 'down'
+          //distance : Distance finger is from initial touch point in px
+          //duration : Length of swipe in MS 
+          //fingerCount : the number of fingers used
+          if (phase!="cancel" && phase!="end") {
+            if (duration<5000)
+              str +="Under maxTimeThreshold.<h3>Swipe handler will be triggered if you release at this point.</h3>"
+            else
+              str +="Over maxTimeThreshold. <h3>Swipe handler will be canceled if you release at this point.</h3>"
+          
+            if (distance<200)
+              str +="Not yet reached threshold.  <h3>Swipe will be canceled if you release at this point.</h3>"
+            else
+              str +="Threshold reached <h3>Swipe handler will be triggered if you release at this point.</h3>"
+          }
+          
+          if (phase=="cancel") olddistance = 0;
+          if (phase=="end") olddistance = 0;  
+          
+          $(".swipearea").html(distance);
+        },
+        threshold:100,
+        maxTimeThreshold:5000,
+        fingers:'all'
+      });
+$( "fieldset" ).hide();
+
+
+
+      
+
+
+
+
+

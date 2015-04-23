@@ -13,6 +13,9 @@
  *
  * Thanks to vor, eskimoblood, spiffistan, FabrizioC
  */
+var seek = false;
+var nooftouches = 0;
+var notouches = 0;
 (function($) {
 
     /**
@@ -46,6 +49,7 @@
     k.o = function () {
         var s = this;
 
+        this.seek = false;
         this.o = null; // array of options
         this.$ = null; // jQuery wrapped element
         this.i = null; // mixed HTMLInputElement or array of HTMLInputElement
@@ -88,6 +92,7 @@
                     // Config
                     min : this.$.data('min') || 0,
                     max : this.$.data('max') || 100,
+                    seek : this.$.data('seek') || true,
                     stopper : true,
                     readOnly : this.$.data('readonly'),
                     noScroll : this.$.data('noScroll'),
@@ -152,16 +157,30 @@
 
             (!this.o.displayInput) && this.$.hide();
 
+            if(!seek){
+
             this.$c = $('<canvas id="xy" width="' +
                             this.o.width + 'px" height="' +
                             this.o.height + 'px"></canvas>');
+        }else{
+            this.seek = true;
+            this.$c = $('<canvas id="seek" width="' +
+                            this.o.width + 'px" height="80px"></canvas>');
+        }
             this.c = this.$c[0].getContext("2d");
 
+            if(!seek){
             this.$
                 .wrap($('<div style="' + (this.o.inline ? 'display:inline;' : '') +
                         'width:' + this.o.width + 'px;height:' +
                         this.o.height + 'px;"></div>'))
                 .before(this.$c);
+                }else{
+                    this.$
+                .wrap($('<div style="' + (this.o.inline ? 'display:inline;' : '') +
+                        'width:' + this.o.width + 'px;height:80px;margin-top: 180px;"></div>'))
+                .before(this.$c);
+                }
 
             if (this.v instanceof Object) {
                 this.cv = {};
@@ -215,9 +234,10 @@
 
             var touchMove = function (e) {
 
+
                 var v = s.xy2val(
-                            e.originalEvent.touches[s.t].pageX,
-                            e.originalEvent.touches[s.t].pageY,
+                            e.originalEvent.touches[0].pageX,
+                            e.originalEvent.touches[0].pageY,
                             'touch'
                             );
 
@@ -228,13 +248,15 @@
                     && (s.cH(v) === false)
                 ) return;
 
-
+                console.log('tlength' + e.originalEvent.touches.length);
                 s.change(v);
                 s._draw();
             };
 
             // get touches index
             this.t = k.c.t(e);
+
+            //notouches = this.t;
 
             if (
                 this.sH
@@ -274,7 +296,7 @@
                     s.cH
                     && (s.cH(v) === false)
                 ) return;
-
+                    
                 s.change(v);
                 s._draw();
             };
@@ -334,6 +356,10 @@
 
         this._listen = function () {
 
+            console.log(this.seek);
+
+            if(!this.seek){
+
             if (!this.o.readOnly) {
                 this.$c
                     .bind(
@@ -341,7 +367,9 @@
                         , function (e) {
                             e.preventDefault();
                             s._xy()._mouse(e);
+                            if(!this.seek){
                             socket.emit('fx_on',{value: true});
+                        }
                         
                          }
                     )
@@ -366,15 +394,67 @@
                     .bind(
                         "touchstart"
                         , function (e) {
+                            
                             e.preventDefault();
                             s._xy()._touch(e);
-                            socket.emit('fx_on',{value: true});
+                            if(!this.seek){
+                            socket.emit('fx_on',{value: true}); }
                          }
                     );
                 this.listen();
             } else {
                 this.$.attr('readonly', 'readonly');
             }
+
+        }else {
+
+if (!this.o.readOnly) {
+                this.$c
+                    .bind(
+                        "mousedown"
+                        , function (e) {
+                            e.preventDefault();
+                            s._xy()._mouse(e);
+                        
+                        
+                         }
+                    )
+                    .bind(
+                        "touchend"
+                        , function (e) {
+                            
+                         }
+                    )
+                    .bind(
+                        "mouseup"
+                        , function (e) {
+                            
+                         }
+                    )
+                    .bind(
+                        "touchcancel"
+                        , function (e) {
+                            
+                         }
+                    )
+                    .bind(
+                        "touchstart"
+                        , function (e) {
+                            e.preventDefault();
+                            s._xy()._touch(e);
+                            
+                         }
+                    );
+                this.listen();
+            } else {
+                this.$.attr('readonly', 'readonly');
+            }
+
+
+
+
+
+        }
 
             return this;
         };
@@ -549,6 +629,8 @@
                                 s.o.stopper
                                 && (v = max(min(v, s.o.max), s.o.min));
 
+                                console.log(v);
+                                    v['touches'] = e.originalEvent.touches.length;
                                 s.change(v);
                                 s._draw();
 
@@ -725,22 +807,32 @@
         this.v = {};
         this.div = null;
         var widthxy = $(window).width();
+        var heightxy;
 
         if(widthxy > 500){
             widthxy = 500;
         }
 
-        console.log("widthxy:" + widthxy);
+        if(seek){
+            heightxy = 200;
+        }else{
+          heightxy = widthxy; 
+        }
+
+        
 
         this.extend = function () {
+                      
             this.o = $.extend(
                 {
+                    
                     min : this.$.data('min') || 0,
                     max : this.$.data('max') || 100,
                     width : widthxy || 200,
                     height : widthxy || 200
                 }, this.o
             );
+
         };
 
         this._coord = function() {

@@ -23,6 +23,7 @@ var canvas = document.getElementById("xy"),
 	W = window.innerWidth,
 	H = window.innerHeight;
 
+
 // Set the canvas to occupy FULL space. We want our creation
 // to rule, don't we?
 
@@ -63,14 +64,30 @@ function paintCanvas() {
 	// won't hurt anyone and we can change it back later.
 	// If you want more controle over colors, then declare
 	// them in a variable.
-	var rgbx = Math.round((mouse.x/300)*255)
-	var rgby = Math.round((mouse.y/300)*255)
+	var rgbx = Math.round((mouse.x/300)*255);
+	var rgby = Math.round((mouse.y/300)*255);
 
 	ctx.globalCompositeOperation = "source-over";
-	ctx.fillStyle = "#03FFFB";
+	ctx.fillStyle = "rgb(0,0,0,1)";
 	if(mouseIsDown){
-	ctx.fillStyle = "rgb("+ rgbx +","+ rgby +",0)";
+	var rgbz = pulse.pulse() * 255;
+
+	if(!flashing){
+		rgbz = 100;
+	}
+
+	if(rgbz > 255){
+		rgbz = 255;
+	}
+
+	rgbz = Math.floor(rgbz);
+	ctx.fillStyle = "rgb("+ rgbx +","+ rgby +", " + rgbz + ")";
+
+}else{
+
 }
+
+
 	ctx.fillRect(0, 0, W, H);
 }
 
@@ -180,10 +197,7 @@ function touchXY(e) {
     mouse.x = e.targetTouches[0].pageX - canvas.offsetLeft;
     mouse.y = e.targetTouches[0].pageY - canvas.offsetTop;
     numtouches = e.targetTouches.length;
-    console.log("Number of touches: " + numtouches);
-    if(numtouches == 2){
-    	alert(numtouches);
-    }
+ 
 }
 
 // The loop
