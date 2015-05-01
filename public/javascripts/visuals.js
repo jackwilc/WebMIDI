@@ -82,7 +82,7 @@ function paintCanvas() {
 	ctx.globalCompositeOperation = "source-over";
 	//ctx.fillStyle = "rgb(0,0,0,0)";
 	if(mouseIsDown){
-	//var rgbz = pulse.pulse() * 255;
+	var rgbz = pulse.pulse() * 255;
 
 	if(!flashing){
 		rgbz = 100;

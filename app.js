@@ -177,6 +177,14 @@ var midiReceived = function(deltaTime, message){
       console.log('loop b active');
       io.sockets.emit('loopactiveb', message[2]); 
     }
+    if(message[1] == 16){
+      console.log('flux a on');
+      io.sockets.emit('fluxona', message[2]); 
+    }
+    if(message[1] == 17){
+      console.log('flux b on');
+      io.sockets.emit('fluxonb', message[2]); 
+    }
 
   }
 

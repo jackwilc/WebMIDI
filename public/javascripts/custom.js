@@ -16,8 +16,6 @@ var loopbon = false;
 var deckb = false;
 var touchcount = 0;
 
-
-
 var $pad = $(".pad")
 
                             .xy({
@@ -130,7 +128,7 @@ $(".bars").bars({
                              show();
 
 
-document.onmousedown=disableclick;
+document.ontouchstart=disableclick;
 function disableclick(event)
 {
   if(event.button==2)
@@ -177,6 +175,7 @@ $( "#fx2" ).on("touchstart", function(ev) {
     $("#fx1").removeClass('active');
     socket.emit('change_fx',{number: 2});
 });
+
 
 $( "#halfloop" ).click(function() {
     socket.emit('halfloop');
@@ -305,7 +304,7 @@ function loophighlight(data){
 
 }
 
-$( "#deck1" ).on("touchstart mousedown", function(ev) {
+$( "#deck1" ).on("touchstart", function(ev) {
     if(loopaon){
     
     loophighlight(deckaloop);
@@ -317,7 +316,7 @@ $( "#deck1" ).on("touchstart mousedown", function(ev) {
     $("#deck2").removeClass('active');
     socket.emit('change_deck',{number: 1});
 });
-$( "#deck2" ).on("touchstart mousedown", function(ev) {
+$( "#deck2" ).on("touchstart", function(ev) {
   if(loopbon){
     
     loophighlight(deckbloop);
@@ -330,7 +329,7 @@ $( "#deck2" ).on("touchstart mousedown", function(ev) {
     socket.emit('change_deck',{number: 2});
 });
 
-$("#quart").on("touchstart mousedown", function(ev) {
+$("#quart").on("touchstart", function(ev) {
 
     if(deckb){
         deckbloop = 3;
@@ -399,7 +398,7 @@ $( "#16" ).on("touchstart", function(ev) {
     socket.emit('loop',{length: 16});
 });
 
-$( "#32" ).on("mousedown", function(ev) {
+$( "#32" ).on("touchstart", function(ev) {
   if(deckb){
         deckbloop =10;
     }else{
@@ -415,7 +414,7 @@ socket.on('change_fx',function(data){
 });
 
 socket.on('loopactive',function(data){
-  if(data == 0){
+  if(data == 0 && !deckb){
         loopaon = false;
         loophighlight(-1);
   }else{
@@ -424,8 +423,33 @@ socket.on('loopactive',function(data){
   }
 });
 
+socket.on('fluxona',function(data){
+  if(data == 0 && !deckb){
+        $('#halfloop').removeClass('active');
+  }else{
+    $('#halfloop').addClass('active');
+  }
+});
+
+socket.on('fluxonb',function(data){
+  if(data == 0 && deckb){
+        $('#halfloop').removeClass('active');
+  }else{
+    $('#halfloop').addClass('active');
+  }
+});
+
+
+socket.on('fluxonb',function(data){
+  if(data == 0 && deckb){
+        $('#halfloop').removeClass('active');
+  }else{
+    $('#halfloop').addClass('active');
+  }
+});
+
 socket.on('loopactiveb',function(data){
-  if(data == 0){
+  if(data == 0 && deckb){
         loopbon = false;
         loophighlight(-1);
   }else{
@@ -446,6 +470,8 @@ socket.on('loopset',function(data){
   }
 
 });
+
+
 
 socket.on('loopsetb',function(data){
 
@@ -478,7 +504,7 @@ $('ul.tabs').each(function(){
     });
 
     // Bind the click event handler
-    $(this).on('touchstart mousedown', 'a', function(e){
+    $(this).on('touchstart touchstart', 'a', function(e){
 
       // Make the old tab inactive.
       $active.parent().removeClass('activetab');
