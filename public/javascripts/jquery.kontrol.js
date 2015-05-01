@@ -16,6 +16,7 @@
 var seek = false;
 var nooftouches = 0;
 var notouches = 0;
+var displaybar = false;
 (function($) {
 
     /**
@@ -178,7 +179,7 @@ var notouches = 0;
                 }else{
                     this.$
                 .wrap($('<div style="' + (this.o.inline ? 'display:inline;' : '') +
-                        'width:' + this.o.width + 'px;height:80px;margin-top: 180px;"></div>'))
+                        'width:' + this.o.width + 'px;height:80px;margin-top: 0px;"></div>'))
                 .before(this.$c);
                 }
 
@@ -248,8 +249,23 @@ var notouches = 0;
                     && (s.cH(v) === false)
                 ) return;
 
-                console.log('tlength' + e.originalEvent.touches.length);
-                s.change(v);
+                if(e.originalEvent.touches.length == 2){
+                    var v2 = s.xy2val(
+                            e.originalEvent.touches[1].pageX,
+                            e.originalEvent.touches[1].pageY,
+                            'touch'
+                            );
+                    //alert(v2);
+                    v[2] = v2[0];
+                    v[3] = v2[1];
+
+                }
+
+                var array = $.map(v, function(value, index) {
+                return [value];
+                });
+
+                s.change(array);
                 s._draw();
             };
 
@@ -398,6 +414,7 @@ var notouches = 0;
                             e.preventDefault();
                             s._xy()._touch(e);
                             if(!this.seek){
+                            $( "#xy" )
                             socket.emit('fx_on',{value: true}); }
                          }
                     );
@@ -415,6 +432,7 @@ if (!this.o.readOnly) {
                         , function (e) {
                             e.preventDefault();
                             s._xy()._mouse(e);
+                            displaybar = true;
                         
                         
                          }
@@ -422,24 +440,26 @@ if (!this.o.readOnly) {
                     .bind(
                         "touchend"
                         , function (e) {
-                            
+
+                            displaybar = false;
                          }
                     )
                     .bind(
                         "mouseup"
                         , function (e) {
-                            
+                            displaybar = false;
                          }
                     )
                     .bind(
                         "touchcancel"
                         , function (e) {
-                            
+                            displaybar = false;
                          }
                     )
                     .bind(
                         "touchstart"
                         , function (e) {
+                            displaybar = true;
                             e.preventDefault();
                             s._xy()._touch(e);
                             
@@ -881,9 +901,11 @@ if (!this.o.readOnly) {
         };
 
         this.xy2val = function (x, y) {
+
             this.m[0] = max(this.cur2, min(x - this.x, this.o.width - this.cur2));
             this.m[1] = max(this.cur2, min(y - this.y, this.o.height - this.cur2));
 
+            
             return {
                 0 : ~~ (this.o.min + (this.m[0] - this.cur2) * this.f[0]),
                 1 : ~~ (this.o.min + (this.o.height - this.m[1] - this.cur2) * this.f[1])
@@ -930,15 +952,30 @@ if (!this.o.readOnly) {
                 c.stroke();
                 r = (this.cv[0] == this.v[0] && this.cv[1] == this.v[1]);
             }
-
+            if(displaybar){
+            c.fillStyle = "rgba(160,160,160,1)";
+            c.fillRect(0, 0, this.o.width, this.o.height);
             c.beginPath();
             c.lineWidth = this.cursor;
             c.strokeStyle = r  ? this.o.fgColor : this.fgColor;
-            c.moveTo(this.m[0], this.m[1] + this.cur2);
-            c.lineTo(this.m[0], this.m[1] - this.cur2);
+            
+            c.moveTo(this.m[0], this.m[1] - 200);
+            //c.lineTo(this.m[0], this.m[1] - this.cur2);
+            c.lineTo(this.m[0], 400);
+
             c.stroke();
+        }
+        else{
+            if(this.cur2 == 2){
+            c.font= "70px Arial";
+            c.fillStyle = "rgb(255,255,255)";
+            c.textAlign = 'center';
+            c.fillText("SEEK" ,this.o.width/2,64);
+        }
+}
+        }
         };
-    };
+    
 
     $.fn.xy = function (o) {
         return this.each(

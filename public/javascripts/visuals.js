@@ -15,8 +15,10 @@ var mousedown = true;
 
 // Initialize the canvas first with 2d context like 
 // we always do.
-var canvas = document.getElementById("xy"),
-	ctx = canvas.getContext("2d"),
+var canvas = document.getElementById("xy");
+
+var offscreenCanvas = document.createElement('canvas');
+
 	
 	// Now get the height and width of window so that
 	// it works on every resolution. Yes! on mobiles too.
@@ -31,10 +33,20 @@ var canvas = document.getElementById("xy"),
 if($(window).width() > 500){
 	canvas.width = 500;
 	canvas.height = 500;
+
 }else{
 	canvas.width = $(window).width();
 	canvas.height = $(window).width();
+
 }
+
+offscreenCanvas.width = canvas.width;
+offscreenCanvas.height = canvas.height;
+
+var ctx = canvas.getContext("2d");
+
+var ctxMain = canvas.getContext('2d');
+
 
 
 
@@ -64,13 +76,13 @@ function paintCanvas() {
 	// won't hurt anyone and we can change it back later.
 	// If you want more controle over colors, then declare
 	// them in a variable.
-	var rgbx = Math.round((mouse.x/300)*255);
-	var rgby = Math.round((mouse.y/300)*255);
+	var rgbx = Math.round((mouse.x/canvas.width)*255);
+	var rgby = Math.round((mouse.y/canvas.height)*255);
 
 	ctx.globalCompositeOperation = "source-over";
-	ctx.fillStyle = "rgb(0,0,0,1)";
+	//ctx.fillStyle = "rgb(0,0,0,0)";
 	if(mouseIsDown){
-	var rgbz = pulse.pulse() * 255;
+	//var rgbz = pulse.pulse() * 255;
 
 	if(!flashing){
 		rgbz = 100;
@@ -83,12 +95,21 @@ function paintCanvas() {
 	rgbz = Math.floor(rgbz);
 	ctx.fillStyle = "rgb("+ rgbx +","+ rgby +", " + rgbz + ")";
 
+	//$('#xy').css('background-color', "rgb("+ rgbx +","+ rgby +", " + rgbz + ")");
+	ctx.fillRect(0, 0, W, H);
+
 }else{
 
+	ctx.clearRect(0, 0, canvas.width, canvas.height);
+	var textx = canvas.width / 2;
+    var texty = canvas.height / 2;
+    var fontsize = 36 + (pulse.pulse() * 2)
+	ctx.font= fontsize + "px Arial";
+	ctx.fillStyle = "rgb(255,255,255)";
+	ctx.textAlign = 'center';
+	ctx.fillText("TOUCH ME!" ,textx,texty);
 }
-
-
-	ctx.fillRect(0, 0, W, H);
+	//ctx.fillRect(0, 0, W, H);
 }
 
 // This will act as a class which we will use to create
@@ -99,8 +120,6 @@ function Circle() {
 	this.x = Math.random() * W;
 	this.y = Math.random() * H;
 	
-	this.radius = 100;
-	
 	this.r = Math.floor(Math.random() * 255);
 	this.g = Math.floor(Math.random() * 255);
 	this.b = Math.floor(Math.random() * 255);
@@ -108,10 +127,11 @@ function Circle() {
 	this.color = "rgb("+ this.r +", "+ this.g +", "+ this.b +")";
 	
 	this.draw = function() {
+		//this.radius = 90 + (pulse.pulse() * 40)
 		ctx.globalCompositeOperation = "lighter";
 		ctx.beginPath();
 		ctx.fillStyle = this.color;
-		ctx.arc(this.x, this.y, this.radius, 0, Math.PI*2, false);
+		ctx.arc(this.x, this.y, 90 + (pulse.pulse() * 40), 0, Math.PI*2, false);
 		ctx.fill();
 		ctx.closePath();
 	}
@@ -133,9 +153,7 @@ function draw() {
 			c2 = circles[i-1];
 
 	
-			if(false){
-		circles[circles.length - 1].draw();
-	}
+			
 		
 		if(mouse.x && mouse.y) {
 			circles[circles.length - 1].x = mouse.x;
@@ -162,7 +180,6 @@ if(!mouseIsDown){
 }
 
 
-
 }
 
 function mouseUp() {
@@ -174,15 +191,20 @@ function mouseUp() {
 function touchUp() {
 }
  
-function mouseDown() {
+function mouseDown(e) {
 	console.log('Mouse Down!');
     mouseIsDown = true;
     circlesrendered = circlesCount;
+    mouse.x = e.pageX - canvas.offsetLeft;
+    mouse.y = e.pageY - canvas.offsetTop;
     console.log(circlesrendered);
 }
  
-function touchDown() {
+function touchDown(e) {
     mouseIsDown = true;
+    circlesrendered = circlesCount;
+    mouse.x = e.pageX - canvas.offsetLeft;
+    mouse.y = e.pageY - canvas.offsetTop;
     touchXY();
 }
 
@@ -202,7 +224,9 @@ function touchXY(e) {
 
 // The loop
 function animloop() {
+
     draw();
+
   
 	requestAnimFrame(animloop);
 

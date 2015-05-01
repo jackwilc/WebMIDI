@@ -32,7 +32,6 @@ var deck = 1;
 var server;
 var beats = [];
 
-console.log(process.hrtime());
 
 //Detect the local IP address of the machine
 Object.keys(ifaces).forEach(function (ifname) {
@@ -161,12 +160,49 @@ var midiReceived = function(deltaTime, message){
     // little height to pump through a web socket.
     if(message != 248){
     console.log(message);
+
+    if(message[1] == 10){
+      console.log('loop a changed!');
+      io.sockets.emit('loopset', message[2]); 
+    }
+    if(message[1] == 11){
+      console.log('loop active');
+      io.sockets.emit('loopactive', message[2]); 
+    }
+    if(message[1] == 12){
+      console.log('loop b changed!');
+      io.sockets.emit('loopsetb', message[2]); 
+    }
+    if(message[1] == 13){
+      console.log('loop b active');
+      io.sockets.emit('loopactiveb', message[2]); 
+    }
+
   }
 
     if (message == MIDI_CLOCK){
+        var time = process.hrtime();
+        time = time[1] / 1000000;
+        
+        // convert 'milliseconds per beats to 'beats per minute'
+        //bpm = 60 / bpm;
+
+      beats.push(time);
+      if (beats.length > 1){
+      if (beats.length > 10){
+        beats.shift()
+      }
+      var bpm = (beats[0] - beats[beats.length-1]) / 1;
+      //this.mspb = (this.beats[this.beats.length-1] - this.beats[0]) / (this.beats.length-1);
+      // convert 'milliseconds per beats to 'beats per minute'
+      bpm = bpm;
+  
+    }
+
+        
       if (clockCount % (MIDI_PPQN/SOCKET_PPQN) == 0){
         io.sockets.emit('midi', message); 
-        beats.push(process.hrtime());
+
         clockCount = 0;
       }
       clockCount ++;
@@ -272,32 +308,40 @@ io.sockets.on('connection', function (socket) {
 
     switch(data.length) {
       case 0.25:
+        midiOut.sendMessage(help.noteOn(75 + (10 * (deck - 1)), 100));
         midiOut.sendMessage(help.noteOn(76 + (10 * (deck - 1)), 100));
-        console.log((76 + (10 * (deck - 1))));
+        
         break;
         case 0.5:
+        midiOut.sendMessage(help.noteOn(75 + (10 * (deck - 1)), 100));
         midiOut.sendMessage(help.noteOn(77 + (10 * (deck - 1)), 100));
         console.log((77 + (10 * (deck - 1))));
         break;
         case 1:
+        midiOut.sendMessage(help.noteOn(75 + (10 * (deck - 1)), 100));
         midiOut.sendMessage(help.noteOn(78 + (10 * (deck - 1)), 100));
         console.log((78 + (10 * (deck - 1))));
         break;
         case 2:
+        midiOut.sendMessage(help.noteOn(75 + (10 * (deck - 1)), 100));
         midiOut.sendMessage(help.noteOn(79 + (10 * (deck - 1)), 100));
         console.log((79 + (10 * (deck - 1))));
         break;
     case 4:
+        midiOut.sendMessage(help.noteOn(75 + (10 * (deck - 1)), 100));
         midiOut.sendMessage(help.noteOn(80 + (10 * (deck - 1)), 100));
         console.log((80 + (10 * (deck - 1))));
         break;
     case 8:
+        midiOut.sendMessage(help.noteOn(75 + (10 * (deck - 1)), 100));
         midiOut.sendMessage(help.noteOn(81 + (10 * (deck - 1)), 100));
         break;
     case 16:
+        midiOut.sendMessage(help.noteOn(75 + (10 * (deck - 1)), 100));
         midiOut.sendMessage(help.noteOn(82 + (10 * (deck - 1)), 100));
         break;
     case 32:
+        midiOut.sendMessage(help.noteOn(75 + (10 * (deck - 1)), 100));
         midiOut.sendMessage(help.noteOn(83 + (10 * (deck - 1)), 100));
         break;
     default:
@@ -366,12 +410,12 @@ function notesoff(){
   });
 
   socket.on('loada',function(data){
-    console.log('menu down');
+    console.log('loada');
     midiOut.sendMessage(help.noteOn(126, 127));
   });
 
   socket.on('loadb',function(data){
-    console.log('menu down');
+    console.log('loadb');
     midiOut.sendMessage(help.noteOn(127, 127));
   });
 

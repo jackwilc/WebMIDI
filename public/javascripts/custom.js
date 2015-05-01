@@ -7,6 +7,16 @@ var oldxx = 0;
 var oldyy = 0;
 var olddistance = 0;
 var supportsVibrate = "vibrate" in navigator;
+var fadevar;
+var scrolling = false;
+var deckaloop = 0;
+var loopaon = false;
+var deckbloop = 0;
+var loopbon = false;
+var deckb = false;
+var touchcount = 0;
+
+
 
 var $pad = $(".pad")
 
@@ -20,24 +30,23 @@ var $pad = $(".pad")
                                     , bgColor:"#EEEEEE"
                                     , change : function (value) {
                                           
-                                          console.log('yo' + value['touches']);
+                                          console.log(value);
 
-                                        //console.log("change : ", value);
-                                        if(value['touches'] != 2){
+                                            
+
+                                            var array = $.map(value, function(value, index) {
+                                          return [value];
+                                          });
+                                          console.log(array.length);
+
                                           socket.emit('notedown',{message: value[0], message1: value[1]});
-                                        }else{
-                                          socket.emit('trackseek',{message: value[0]});
-                                        }
+                                   
                                         
                                     }
                                 })
                             .css({'border':'0px dashed #fff'});
 
 
-$( "#xy" ).bind( "touchmove", function(e) {
-  console.log('TOUCHES' + e.originalEvent.touches.length);
-  ntouches = e.originalEvent.touches.length;
-});
 
 seek = true;
 var $pad = $(".trackseek")
@@ -46,8 +55,8 @@ var $pad = $(".trackseek")
                                     , min : 0
                                     , max : 126
                                     , stretch: true
-                                    , cursor: 20
-                                    , fgColor:"#fff"
+                                    , cursor: 4
+                                    , fgColor:"#FF3300"
                                     , bgColor:"#000000"
                                     , change : function (value) {
                                         //console.log("change : ", value);
@@ -158,12 +167,12 @@ $( ".flashingbutton" ).click(function() {
 
 });
 
-$( "#fx1" ).click(function() {
+$( "#fx1" ).on("touchstart", function(ev) {
     $("#fx1").addClass('active');
     $("#fx2").removeClass('active');
     socket.emit('change_fx',{number: 1});
 });
-$( "#fx2" ).click(function() {
+$( "#fx2" ).on("touchstart", function(ev) {
     $("#fx2").addClass('active');
     $("#fx1").removeClass('active');
     socket.emit('change_fx',{number: 2});
@@ -197,55 +206,255 @@ $( "#hc2d2" ).click(function() {
     socket.emit('hc2d2');
 });
 
-$( "#deck1" ).click(function() {
+function loophighlight(data){
+
+
+  switch(data){
+      case 3:
+        $( "#quart" ).addClass('active');
+        $( "#half" ).removeClass('active');
+        $( "#1" ).removeClass('active');
+        $( "#2" ).removeClass('active');
+        $( "#4" ).removeClass('active');
+        $( "#8" ).removeClass('active');
+        $( "#16" ).removeClass('active');
+        $( "#32" ).removeClass('active');
+        break;
+    case 4:
+        $( "#quart" ).removeClass('active');
+        $( "#half" ).addClass('active');
+        $( "#1" ).removeClass('active');
+        $( "#2" ).removeClass('active');
+        $( "#4" ).removeClass('active');
+        $( "#8" ).removeClass('active');
+        $( "#16" ).removeClass('active');
+        $( "#32" ).removeClass('active');
+        break;
+    case 5:
+        $( "#quart" ).removeClass('active');
+        $( "#half" ).removeClass('active');
+        $( "#1" ).addClass('active');
+        $( "#2" ).removeClass('active');
+        $( "#4" ).removeClass('active');
+        $( "#8" ).removeClass('active');
+        $( "#16" ).removeClass('active');
+        $( "#32" ).removeClass('active');
+        break;
+    case 6:
+        $( "#quart" ).removeClass('active');
+        $( "#half" ).removeClass('active');
+        $( "#2" ).addClass('active');
+        $( "#1" ).removeClass('active');
+        $( "#4" ).removeClass('active');
+        $( "#8" ).removeClass('active');
+        $( "#16" ).removeClass('active');
+        $( "#32" ).removeClass('active');
+        break;
+    case 7:
+        $( "#quart" ).removeClass('active');
+        $( "#half" ).removeClass('active');
+        $( "#1" ).removeClass('active');
+        $( "#2" ).removeClass('active');
+        $( "#4" ).addClass('active');
+        $( "#8" ).removeClass('active');
+        $( "#16" ).removeClass('active');
+        $( "#32" ).removeClass('active');
+        break;
+    case 8:
+        $( "#quart" ).removeClass('active');
+        $( "#half" ).removeClass('active');
+        $( "#1" ).removeClass('active');
+        $( "#2" ).removeClass('active');
+        $( "#4" ).removeClass('active');
+        $( "#8" ).addClass('active');
+        $( "#16" ).removeClass('active');
+        $( "#32" ).removeClass('active');
+        break;
+      case 9:
+        $( "#quart" ).removeClass('active');
+        $( "#half" ).removeClass('active');
+        $( "#1" ).removeClass('active');
+        $( "#2" ).removeClass('active');
+        $( "#4" ).removeClass('active');
+        $( "#8" ).removeClass('active');
+        $( "#16" ).addClass('active');
+        $( "#32" ).removeClass('active');
+        break;
+      case 10:
+        $( "#quart" ).removeClass('active');
+        $( "#half" ).removeClass('active');
+        $( "#1" ).removeClass('active');
+        $( "#2" ).removeClass('active');
+        $( "#4" ).removeClass('active');
+        $( "#8" ).removeClass('active');
+        $( "#16" ).removeClass('active');
+        $( "#32" ).addClass('active');
+        break;
+      case -1:
+        $( "#quart" ).removeClass('active');
+        $( "#half" ).removeClass('active');
+        $( "#1" ).removeClass('active');
+        $( "#2" ).removeClass('active');
+        $( "#4" ).removeClass('active');
+        $( "#8" ).removeClass('active');
+        $( "#16" ).removeClass('active');
+        $( "#32" ).removeClass('active');
+        break;
+
+    }
+
+}
+
+$( "#deck1" ).on("touchstart mousedown", function(ev) {
+    if(loopaon){
+    
+    loophighlight(deckaloop);
+  }else{
+    loophighlight(-1);
+  }
+    deckb = false;
     $("#deck1").addClass('active');
     $("#deck2").removeClass('active');
     socket.emit('change_deck',{number: 1});
 });
-$( "#deck2" ).click(function() {
+$( "#deck2" ).on("touchstart mousedown", function(ev) {
+  if(loopbon){
+    
+    loophighlight(deckbloop);
+  }else{
+    loophighlight(-1);
+  }
+    deckb = true;
     $("#deck2").addClass('active');
     $("#deck1").removeClass('active');
     socket.emit('change_deck',{number: 2});
 });
 
-$( "#quart" ).click(function() {
+$("#quart").on("touchstart mousedown", function(ev) {
+
+    if(deckb){
+        deckbloop = 3;
+    }else{
+        deckaloop = 3;
+    }
+
     socket.emit('loop',{length: 0.25});
 });
+/*
+$( "#quart" ).click(function() {
+    socket.emit('loop',{length: 0.25});
+}); */
 
-$( "#half" ).click(function() {
+$( "#half" ).on("touchstart", function(ev) {
+  if(deckb){
+        deckbloop = 4;
+    }else{
+        deckaloop = 4;
+    }
     socket.emit('loop',{length: 0.5});
 });
 
-$( "#1" ).click(function() {
+$( "#1" ).on("touchstart", function(ev) {
+  if(deckb){
+        deckbloop = 5;
+    }else{
+        deckaloop = 5;
+    }
     socket.emit('loop',{length: 1});
 });
 
-$( "#2" ).click(function() {
+$( "#2" ).on("touchstart", function(ev) {
+  if(deckb){
+        deckbloop = 6;
+    }else{
+        deckaloop = 6;
+    }
     socket.emit('loop',{length: 2});
 });
 
-$( "#4" ).click(function() {
+$( "#4" ).on("touchstart", function(ev) {
+  if(deckb){
+        deckbloop = 7;
+    }else{
+        deckaloop = 7;
+    }
     socket.emit('loop',{length: 4});
 });
 
-$( "#8" ).click(function() {
-
+$( "#8" ).on("touchstart", function(ev) {
+  if(deckb){
+        deckbloop = 8;
+    }else{
+        deckaloop = 8;
+    }
     socket.emit('loop',{length: 8});
 });
 
-$( "#16" ).click(function() {
-
+$( "#16" ).on("touchstart", function(ev) {
+  if(deckb){
+        deckbloop = 9;
+    }else{
+        deckaloop = 9;
+    }
     socket.emit('loop',{length: 16});
 });
 
-$( "#32" ).click(function() {
-
+$( "#32" ).on("mousedown", function(ev) {
+  if(deckb){
+        deckbloop =10;
+    }else{
+        deckaloop = 10;
+    }
     socket.emit('loop',{length: 32});
 });
 
 socket.on('change_fx',function(data){
 
     console.log(data.number);
+
+});
+
+socket.on('loopactive',function(data){
+  if(data == 0){
+        loopaon = false;
+        loophighlight(-1);
+  }else{
+    loopaon = true;
+     loophighlight(deckaloop);
+  }
+});
+
+socket.on('loopactiveb',function(data){
+  if(data == 0){
+        loopbon = false;
+        loophighlight(-1);
+  }else{
+    loopbon = true;
+     loophighlight(deckbloop);
+  }
+});
+
+
+
+socket.on('loopset',function(data){
+
+    console.log(data.number);
+
+    deckaloop = data;
+    if(!deckb && loopaon){
+    loophighlight(data);
+  }
+
+});
+
+socket.on('loopsetb',function(data){
+
+    console.log(data.number);
+
+    deckbloop = data;
+if(deckb && loopbon){
+    loophighlight(data);
+  }
 
 });
 
@@ -269,7 +478,8 @@ $('ul.tabs').each(function(){
     });
 
     // Bind the click event handler
-    $(this).on('click', 'a', function(e){
+    $(this).on('touchstart mousedown', 'a', function(e){
+
       // Make the old tab inactive.
       $active.parent().removeClass('activetab');
       $content.hide();
@@ -334,35 +544,74 @@ if($(window).height() < newwidth + 128 + 65){
 if($(window).height() > 500){
 
 }
+    
+   
 
 
     $( ".container" ).css( "width", newwidth);
-    $( ".quartbutton" ).css( "width", ((newwidth/4) - 10));
-    $( ".halfbutton" ).css( "width", ((newwidth/2) - 8));
-    $( ".footerbuttons" ).css( "width", ((newwidth/4 - 12)));
+    $( ".quartbutton" ).css( "width", ((newwidth/4) - 9));
+    $( ".halfbutton" ).css( "width", ((newwidth/2) - 6));
+    $( ".footerbuttons" ).css( "width", ((newwidth/4 - 11.5)));
     $( ".site-footer" ).css( "width", newwidth);
-    $( "#buttongroup" ).css( "width", newwidth);
+    $( "#buttongroup" ).css( "width", newwidth)
+    var backgroundheight = $(window).height() - 120;
+    $( ".swipearea" ).css( "background-size", newwidth + 'px 500px');
+    
   
 $( ".container" ).css( "height" , $(window).height() - 65);
+$( ".swipearea" ).css( "height" , $(window).height() - 65);
+var remainingwidth = $(window).height() - 65 - newwidth;
+console.log(remainingwidth);
+if(remainingwidth < 110){
+  //$( "#fx1, #fx2" ).css( "height", (remainingwidth/2) - 20);
+}else{
+  //$( "#fx1, #fx2, #fx3, #fx4" ).css( "height", (remainingwidth/2) - 20);
+}
+
 $( ".swipearea" ).css( "height" , $(window).height() - 30);
 $( window ).resize(function() {
   $( ".container" ).css( "height" , $(window).height() - 65);
 });
 
+function scrollfalse(){
+  scrolling = false;
+}
+
+$(".swipearea").on("touchend", function(ev) {
+    setTimeout(scrollfalse, 200);
+});
+
 $(".swipearea").swipe( {
 
         tap:function(event, target) {
+          if(!scrolling){
           socket.emit('browser');
+        }
         },
 
         swipeLeft:function(event, direction, distance, duration, fingerCount) {
           socket.emit('loada');
+          if(supportsVibrate){
           navigator.vibrate(300);
+          }
+          $(".swipearea").css({'background-image':'url(/images/decka.png)'});
+          clearInterval(fadevar);
+          fadevar = setTimeout(function(){ 
+            $(".swipearea").css({'background-image':'url(/images/scroll.png)'});
+          }, 1000);
         },
 
         swipeRight:function(event, direction, distance, duration, fingerCount) {
           socket.emit('loadb'); 
+          if(supportsVibrate){
           navigator.vibrate(300);
+          }
+          $(".swipearea").css({'background-image':'url(/images/deckb.png)'});
+          clearInterval(fadevar);
+          fadevar = setTimeout(function(){ 
+            $(".swipearea").css({'background-image':'url(/images/scroll.png)'});
+          }, 1000);
+      
         },
         
 
@@ -374,23 +623,10 @@ $(".swipearea").swipe( {
 
           var newdistance; 
 
-        
-
-
-
-          
-          var str = "<h4>Swipe Phase : " + phase + "<br/>";
-          str += "Direction from inital touch: " + direction + "<br/>";
-          str += "Distance from inital touch: " + distance + "<br/>";
-          str += "Duration of swipe: " + duration + "<br/>";
-          str += "Fingers used: " + fingers + "<br/></h4>";
-
 
           newdistance = distance / 40;
 
           newdistance = Math.floor(newdistance);
-
-          str += "5distance " + newdistance + "<br/></h4>";
 
           direction = direction;
 
@@ -402,11 +638,13 @@ $(".swipearea").swipe( {
             if(newdistance >= olddistance + 1){
             olddistance = newdistance;
             socket.emit('menuup');
+            scrolling = true;
           }
 
           if(newdistance <= olddistance - 1){
             olddistance = newdistance;
             socket.emit('menudown');
+            scrolling = true;
           }
           }
 
@@ -414,50 +652,27 @@ $(".swipearea").swipe( {
             if(newdistance >= olddistance + 1){
             olddistance = newdistance;
             socket.emit('menudown');
+            scrolling = true;
           }
 
           if(newdistance <= olddistance - 1){
             olddistance = newdistance;
             socket.emit('menuup');
+            scrolling = true;
           }
           }
-          
-
-
-          
-
         
-
-
-
-          //Here we can check the:
-          //phase : 'start', 'move', 'end', 'cancel'
-          //direction : 'left', 'right', 'up', 'down'
-          //distance : Distance finger is from initial touch point in px
-          //duration : Length of swipe in MS 
-          //fingerCount : the number of fingers used
-          if (phase!="cancel" && phase!="end") {
-            if (duration<5000)
-              str +="Under maxTimeThreshold.<h3>Swipe handler will be triggered if you release at this point.</h3>"
-            else
-              str +="Over maxTimeThreshold. <h3>Swipe handler will be canceled if you release at this point.</h3>"
-          
-            if (distance<200)
-              str +="Not yet reached threshold.  <h3>Swipe will be canceled if you release at this point.</h3>"
-            else
-              str +="Threshold reached <h3>Swipe handler will be triggered if you release at this point.</h3>"
-          }
           
           if (phase=="cancel") olddistance = 0;
           if (phase=="end") olddistance = 0;  
-          
-          $(".swipearea").html(distance);
+
         },
-        threshold:100,
+        threshold:40,
         maxTimeThreshold:5000,
         fingers:'all'
       });
 $( "fieldset" ).hide();
+
 
 
 

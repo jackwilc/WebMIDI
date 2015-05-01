@@ -1,6 +1,6 @@
 div#overlay
 div#lc 
-    img(src="/images/load.gif")
+    img(src="/images/load.svg")
     p LOOKING FOR SERVER
 .container
     div#tab1
@@ -15,32 +15,31 @@ div#lc
         div.buttonspacer#lower
         div.halfbutton#fx4 FX 4
     div#tab2
-        div.halfbutton#halfloop /2
+        div.halfbutton#halfloop SLIP MODE
         div.buttonspacer
-        div.halfbutton#doubleloop x2
+        div.halfbutton#doubleloop PITCH LOCK
+        div.quartbutton.leftside#quart 1/4
+        div.buttonspacer
+        div.quartbutton#half 1/2
+        div.buttonspacer
+        div.quartbutton#1 1
+        div.buttonspacer
+        div.quartbutton.rightside#2 2
         div.buttonrow
-            div.quartbutton#quart 1/4
-            div.buttonspacer
-            div.quartbutton#half 1/2
-            div.buttonspacer
-            div.quartbutton#1 1
-            div.buttonspacer
-            div.quartbutton#2 2
-        div.buttonrow
-            div.quartbutton#4 4
+            div.quartbutton.leftside#4 4
             div.buttonspacer
             div.quartbutton#8 8
             div.buttonspacer
             div.quartbutton#16 16
             div.buttonspacer
-            div.quartbutton#32 32
+            div.quartbutton.rightside#32 32
         div.seek
-        div.halfbutton#deck1 DECK A
-        div.buttonspacer
-        div.halfbutton#deck2 DECK B
         fieldset.trackseek(data-width='300' data-height='100')
                     input(name='x' value='27')
                     input(name='y' value='80')
+        div.halfbutton#deck1 DECK A
+        div.buttonspacer
+        div.halfbutton#deck2 DECK B
     div#tab3 
         div.settingsitem 
             p Pulse Background
@@ -48,9 +47,6 @@ div#lc
         div.settingsitem 
             p Touch Effects
             div#effectstoggle.toggle-soft
-        div.settingsitem 
-            p 4 FX Units
-            div#fxtoggle.toggle-soft
         div.settingtext#latency Network Latency: 23ms
         div.settingtext#latency webMIDI V0.9
     div#tab4
@@ -58,7 +54,7 @@ div#lc
 footer.site-footer
     div#buttongroup
         ul.tabs
-            li.footerbuttons
+            li.footerbuttons#leftfooter
                 a(href="#tab1")
                     img(src="/images/browse.png")
             li.footerbuttons
@@ -67,7 +63,7 @@ footer.site-footer
             li.footerbuttons
                 a(href="#tab4") 
                     img(src="/images/list.png")
-            li.footerbuttons
+            li.footerbuttons#rightfooter
                 a(href="#tab3") 
                     img(src="/images/settings.png")
 script(type="text/javascript", src="/javascripts/jquery.min.js")
