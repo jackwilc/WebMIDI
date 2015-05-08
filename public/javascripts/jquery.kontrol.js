@@ -13,15 +13,6 @@
  *
  * Thanks to vor, eskimoblood, spiffistan, FabrizioC
  */
-var seek = false;
-var nooftouches = 0;
-var notouches = 0;
-var displaybar = false;
-var twotouch = false;
-var points;
-var lock = false;
-var lock2 = false;
-var fxval;
 (function($) {
 
     /**
@@ -55,7 +46,6 @@ var fxval;
     k.o = function () {
         var s = this;
 
-        this.seek = false;
         this.o = null; // array of options
         this.$ = null; // jQuery wrapped element
         this.i = null; // mixed HTMLInputElement or array of HTMLInputElement
@@ -98,7 +88,6 @@ var fxval;
                     // Config
                     min : this.$.data('min') || 0,
                     max : this.$.data('max') || 100,
-                    seek : this.$.data('seek') || true,
                     stopper : true,
                     readOnly : this.$.data('readonly'),
                     noScroll : this.$.data('noScroll'),
@@ -163,30 +152,16 @@ var fxval;
 
             (!this.o.displayInput) && this.$.hide();
 
-            if(!seek){
-
             this.$c = $('<canvas id="xy" width="' +
                             this.o.width + 'px" height="' +
                             this.o.height + 'px"></canvas>');
-        }else{
-            this.seek = true;
-            this.$c = $('<canvas id="seek" width="' +
-                            this.o.width + 'px" height="80px"></canvas>');
-        }
             this.c = this.$c[0].getContext("2d");
 
-            if(!seek){
             this.$
                 .wrap($('<div style="' + (this.o.inline ? 'display:inline;' : '') +
                         'width:' + this.o.width + 'px;height:' +
                         this.o.height + 'px;"></div>'))
                 .before(this.$c);
-                }else{
-                    this.$
-                .wrap($('<div style="' + (this.o.inline ? 'display:inline;' : '') +
-                        'width:' + this.o.width + 'px;height:80px;margin-top: 0px;"></div>'))
-                .before(this.$c);
-                }
 
             if (this.v instanceof Object) {
                 this.cv = {};
@@ -240,10 +215,9 @@ var fxval;
 
             var touchMove = function (e) {
 
-
                 var v = s.xy2val(
-                            e.originalEvent.touches[0].pageX,
-                            e.originalEvent.touches[0].pageY,
+                            e.originalEvent.touches[s.t].pageX,
+                            e.originalEvent.touches[s.t].pageY,
                             'touch'
                             );
 
@@ -254,42 +228,13 @@ var fxval;
                     && (s.cH(v) === false)
                 ) return;
 
-                if(e.originalEvent.touches.length >= 2){
-                    var v2 = s.xy2val(
-                            e.originalEvent.touches[1].pageX,
-                            e.originalEvent.touches[1].pageY,
-                            'touch'
-                            );
-                    //v[2] = v2[0];
-                    //v[3] = v2[1];
-                    points = v2;
-                    twotouch = true;
 
-                }else{
-                        twotouch = false;
-                }
-
-                var array = $.map(v, function(value, index) {
-                return [value];
-                });
-
-                var params;
-
-               if(e.originalEvent.touches.length == 2){
-                  params = {0:v[0], 1:v[1], 2:v[2], lol:v[3]};  
-                }else{
-                    params = {0:v[0], 1:v[1]}; 
-                }
-
-
-                s.change('hellooo');
+                s.change(v);
                 s._draw();
             };
 
             // get touches index
             this.t = k.c.t(e);
-
-            //notouches = this.t;
 
             if (
                 this.sH
@@ -304,25 +249,8 @@ var fxval;
                 .bind("touchmove.k", touchMove)
                 .bind(
                     "touchend.k"
-                    , function (e) {
-                        if(e.originalEvent.touches.length == 0){
+                    , function () {
                         k.c.d.unbind('touchmove.k touchend.k');
-                    }
-
-                    if(e.originalEvent.touches.length == 2){
-                        
-                        
-
-                        if(!lock){
-                            lock = true
-                        }else{
-                            lock = false
-                        }
-
-                    
-
-
-                    }
 
                         if (
                             s.rH
@@ -346,7 +274,7 @@ var fxval;
                     s.cH
                     && (s.cH(v) === false)
                 ) return;
-              
+
                 s.change(v);
                 s._draw();
             };
@@ -406,10 +334,6 @@ var fxval;
 
         this._listen = function () {
 
-      
-
-            if(!this.seek){
-
             if (!this.o.readOnly) {
                 this.$c
                     .bind(
@@ -417,19 +341,14 @@ var fxval;
                         , function (e) {
                             e.preventDefault();
                             s._xy()._mouse(e);
-                            if(!this.seek){
                             socket.emit('fx_on',{value: true});
-                        }
                         
                          }
                     )
                     .bind(
                         "touchend"
                         , function (e) {
-                            if(e.originalEvent.touches.length == 0 && !lock){
                             socket.emit('fx_on',{value: false});
-                        }
-                            
                          }
                     )
                     .bind(
@@ -442,77 +361,20 @@ var fxval;
                         "touchcancel"
                         , function (e) {
                             socket.emit('fx_on',{value: false});
-                      
                          }
                     )
                     .bind(
                         "touchstart"
                         , function (e) {
-                            
                             e.preventDefault();
                             s._xy()._touch(e);
-                            if(!this.seek){
-                            $( "#xy" )
-                            socket.emit('fx_on',{value: true}); }
+                            socket.emit('fx_on',{value: true});
                          }
                     );
                 this.listen();
             } else {
                 this.$.attr('readonly', 'readonly');
             }
-
-        }else {
-
-if (!this.o.readOnly) {
-                this.$c
-                    .bind(
-                        "mousedown"
-                        , function (e) {
-                            e.preventDefault();
-                            s._xy()._mouse(e);
-                            displaybar = true;
-                        
-                        
-                         }
-                    )
-                    .bind(
-                        "touchend"
-                        , function (e) {
-
-                            displaybar = false;
-                         }
-                    )
-                    .bind(
-                        "mouseup"
-                        , function (e) {
-                            displaybar = false;
-                         }
-                    )
-                    .bind(
-                        "touchcancel"
-                        , function (e) {
-                            displaybar = false;
-                         }
-                    )
-                    .bind(
-                        "touchstart"
-                        , function (e) {
-                            displaybar = true;
-                            e.preventDefault();
-                            s._xy()._touch(e);
-                            
-                         }
-                    );
-                this.listen();
-            } else {
-                this.$.attr('readonly', 'readonly');
-            }
-
-
-
-
-
-        }
 
             return this;
         };
@@ -687,9 +549,6 @@ if (!this.o.readOnly) {
                                 s.o.stopper
                                 && (v = max(min(v, s.o.max), s.o.min));
 
-                 
-                                
-                                v['touches'] = e.originalEvent.touches.length;
                                 s.change(v);
                                 s._draw();
 
@@ -866,32 +725,22 @@ if (!this.o.readOnly) {
         this.v = {};
         this.div = null;
         var widthxy = $(window).width();
-        var heightxy;
 
         if(widthxy > 500){
             widthxy = 500;
         }
 
-        if(seek){
-            heightxy = 200;
-        }else{
-          heightxy = widthxy; 
-        }
-
-        
+        console.log("widthxy:" + widthxy);
 
         this.extend = function () {
-                      
             this.o = $.extend(
                 {
-                    
                     min : this.$.data('min') || 0,
                     max : this.$.data('max') || 100,
                     width : widthxy || 200,
                     height : widthxy || 200
                 }, this.o
             );
-
         };
 
         this._coord = function() {
@@ -940,11 +789,9 @@ if (!this.o.readOnly) {
         };
 
         this.xy2val = function (x, y) {
-
             this.m[0] = max(this.cur2, min(x - this.x, this.o.width - this.cur2));
             this.m[1] = max(this.cur2, min(y - this.y, this.o.height - this.cur2));
 
-            
             return {
                 0 : ~~ (this.o.min + (this.m[0] - this.cur2) * this.f[0]),
                 1 : ~~ (this.o.min + (this.o.height - this.m[1] - this.cur2) * this.f[1])
@@ -955,7 +802,6 @@ if (!this.o.readOnly) {
             this.cv = v;
             this.i[0].val(this.cv[0]);
             this.i[1].val(this.cv[1]);
-
         };
 
         this.val = function (v) {
@@ -992,30 +838,15 @@ if (!this.o.readOnly) {
                 c.stroke();
                 r = (this.cv[0] == this.v[0] && this.cv[1] == this.v[1]);
             }
-            if(displaybar){
-            c.fillStyle = "rgba(160,160,160,1)";
-            c.fillRect(0, 0, this.o.width, this.o.height);
+
             c.beginPath();
             c.lineWidth = this.cursor;
             c.strokeStyle = r  ? this.o.fgColor : this.fgColor;
-            
-            c.moveTo(this.m[0], this.m[1] - 200);
-            //c.lineTo(this.m[0], this.m[1] - this.cur2);
-            c.lineTo(this.m[0], 400);
-
+            c.moveTo(this.m[0], this.m[1] + this.cur2);
+            c.lineTo(this.m[0], this.m[1] - this.cur2);
             c.stroke();
-        }
-        else{
-            if(this.cur2 == 2){
-            c.font= "70px Arial";
-            c.fillStyle = "rgb(255,255,255)";
-            c.textAlign = 'center';
-            c.fillText("SEEK" ,this.o.width/2,64);
-        }
-}
-        }
         };
-    
+    };
 
     $.fn.xy = function (o) {
         return this.each(

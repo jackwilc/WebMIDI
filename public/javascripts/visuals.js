@@ -1,3 +1,4 @@
+// RequestAnimFrame: a browser API for getting smooth animations
 window.requestAnimFrame = (function(){
   return  window.requestAnimationFrame       || 
 		  window.webkitRequestAnimationFrame || 
@@ -11,29 +12,32 @@ window.requestAnimFrame = (function(){
 
 var mousedown = true;
 
-var canvas = document.getElementById("xy");
 
-var offscreenCanvas = document.createElement('canvas');
-
+// Initialize the canvas first with 2d context like 
+// we always do.
+var canvas = document.getElementById("xy"),
+	ctx = canvas.getContext("2d"),
+	
+	// Now get the height and width of window so that
+	// it works on every resolution. Yes! on mobiles too.
 	W = window.innerWidth,
 	H = window.innerHeight;
+
+// Set the canvas to occupy FULL space. We want our creation
+// to rule, don't we?
+
 
 if($(window).width() > 500){
 	canvas.width = 500;
 	canvas.height = 500;
-
 }else{
 	canvas.width = $(window).width();
 	canvas.height = $(window).width();
-
 }
 
-offscreenCanvas.width = canvas.width;
-offscreenCanvas.height = canvas.height;
 
-var ctx = canvas.getContext("2d");
 
-var ctxMain = canvas.getContext('2d');
+
 
 canvas.addEventListener("touchstart",mouseDown, false);
 canvas.addEventListener("touchmove",touchXY, false);
@@ -42,6 +46,8 @@ canvas.addEventListener("mouseup",mouseUp, false);
 canvas.addEventListener("mousedown",mouseDown, false);
 canvas.addEventListener("mousemove",mouseXY, false);
 
+
+// Some variables for later use
 var circles = [],
 	circlesCount = 7,
 	mouse = {},
@@ -49,46 +55,34 @@ var circles = [],
 
 var circlesrendered = circlesCount;
 
+// Every basic and common thing is done. Now we'll create
+// a function which will paint the canvas black.
 function paintCanvas() {
 	
-	var rgbx = Math.round((mouse.x/canvas.width)*255);
-	var rgby = Math.round((mouse.y/canvas.height)*255);
+	// Default fillStyle is also black but specifying it
+	// won't hurt anyone and we can change it back later.
+	// If you want more controle over colors, then declare
+	// them in a variable.
+	var rgbx = Math.round((mouse.x/300)*255)
+	var rgby = Math.round((mouse.y/300)*255)
 
 	ctx.globalCompositeOperation = "source-over";
-
+	ctx.fillStyle = "#03FFFB";
 	if(mouseIsDown){
-	var rgbz = pulse.pulse() * 255;
-
-	if(!flashing){
-		rgbz = 100;
-	}
-
-	if(rgbz > 255){
-		rgbz = 255;
-	}
-
-	rgbz = Math.floor(rgbz);
-	ctx.fillStyle = "rgb("+ rgbx +","+ rgby +", " + rgbz + ")";
-
+	ctx.fillStyle = "rgb("+ rgbx +","+ rgby +",0)";
+}
 	ctx.fillRect(0, 0, W, H);
-
-}else{
-
-	ctx.clearRect(0, 0, canvas.width, canvas.height);
-	var textx = canvas.width / 2;
-    var texty = canvas.height / 2;
-    var fontsize = 36 + (pulse.pulse() * 2)
-	ctx.font= fontsize + "px Arial";
-	ctx.fillStyle = "rgb(255,255,255)";
-	ctx.textAlign = 'center';
-	ctx.fillText("TOUCH ME!" ,textx,texty);
-}
-	//ctx.fillRect(0, 0, W, H);
 }
 
+// This will act as a class which we will use to create
+// circle objects. Also, remember that class names are
+// generally started with a CAPITAL letter and are 
+// singular
 function Circle() {
 	this.x = Math.random() * W;
 	this.y = Math.random() * H;
+	
+	this.radius = 100;
 	
 	this.r = Math.floor(Math.random() * 255);
 	this.g = Math.floor(Math.random() * 255);
@@ -100,29 +94,31 @@ function Circle() {
 		ctx.globalCompositeOperation = "lighter";
 		ctx.beginPath();
 		ctx.fillStyle = this.color;
-		ctx.arc(this.x, this.y, 90 + (pulse.pulse() * 40), 0, Math.PI*2, false);
+		ctx.arc(this.x, this.y, this.radius, 0, Math.PI*2, false);
 		ctx.fill();
 		ctx.closePath();
 	}
 }
 
-
+// Insert a random circle to the circles array.
 for(var i = 0; i < circlesCount; i++) {
 	circles.push(new Circle());
 }
 
+// A function that will be called in the loop, so
+// consider it as the `main` function
 function draw() {
 
 	paintCanvas();
-
-	
 
 	for(i = 0; i < circlesCount; i++) {
 		var c1 = circles[i],
 			c2 = circles[i-1];
 
 	
-			
+			if(false){
+		circles[circles.length - 1].draw();
+	}
 		
 		if(mouse.x && mouse.y) {
 			circles[circles.length - 1].x = mouse.x;
@@ -142,13 +138,6 @@ function draw() {
 		}
 }
 
-if(lock){
-		var textx = canvas.width / 2;
-	ctx.fillStyle="#FFFFFF";
-	ctx.font = (20 + pulse.pulse() * 5) + "px Arial";
-	ctx.textAlign = 'center';
-	ctx.fillText("LOCKED",textx,40);
-}
 if(!mouseIsDown){
 	if(circlesrendered > 0){
 	circlesrendered = circlesrendered - 1;
@@ -156,33 +145,27 @@ if(!mouseIsDown){
 }
 
 
+
 }
 
-function mouseUp(e) {
-
-	if(e.touches.length == 0 && !lock){
+function mouseUp() {
+	console.log("Mouse Up!")
 	mouseIsDown = false;
 	circlesrendered = 0;
-}
 }
  
 function touchUp() {
 }
  
-function mouseDown(e) {
-	
+function mouseDown() {
+	console.log('Mouse Down!');
     mouseIsDown = true;
     circlesrendered = circlesCount;
-    mouse.x = e.pageX - canvas.offsetLeft;
-    mouse.y = e.pageY - canvas.offsetTop;
-
+    console.log(circlesrendered);
 }
  
-function touchDown(e) {
+function touchDown() {
     mouseIsDown = true;
-    circlesrendered = circlesCount;
-    mouse.x = e.pageX - canvas.offsetLeft;
-    mouse.y = e.pageY - canvas.offsetTop;
     touchXY();
 }
 
@@ -197,13 +180,15 @@ function touchXY(e) {
     mouse.x = e.targetTouches[0].pageX - canvas.offsetLeft;
     mouse.y = e.targetTouches[0].pageY - canvas.offsetTop;
     numtouches = e.targetTouches.length;
- 
+    console.log("Number of touches: " + numtouches);
+    if(numtouches == 2){
+    	alert(numtouches);
+    }
 }
 
+// The loop
 function animloop() {
-
     draw();
-
   
 	requestAnimFrame(animloop);
 
@@ -211,9 +196,9 @@ function animloop() {
 animloop();
 
 $( "body" ).mouseup(function() {
-  //socket.emit('fx_on',{value: false});
+  socket.emit('fx_on',{value: false});
   paintCanvas();
-  //mouseIsDown = false;
+  mouseIsDown = false;
 });
 
 
