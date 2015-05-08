@@ -17,6 +17,11 @@ var seek = false;
 var nooftouches = 0;
 var notouches = 0;
 var displaybar = false;
+var twotouch = false;
+var points;
+var lock = false;
+var lock2 = false;
+var fxval;
 (function($) {
 
     /**
@@ -249,23 +254,35 @@ var displaybar = false;
                     && (s.cH(v) === false)
                 ) return;
 
-                if(e.originalEvent.touches.length == 2){
+                if(e.originalEvent.touches.length >= 2){
                     var v2 = s.xy2val(
                             e.originalEvent.touches[1].pageX,
                             e.originalEvent.touches[1].pageY,
                             'touch'
                             );
-                    //alert(v2);
-                    v[2] = v2[0];
-                    v[3] = v2[1];
+                    //v[2] = v2[0];
+                    //v[3] = v2[1];
+                    points = v2;
+                    twotouch = true;
 
+                }else{
+                        twotouch = false;
                 }
 
                 var array = $.map(v, function(value, index) {
                 return [value];
                 });
 
-                s.change(array);
+                var params;
+
+               if(e.originalEvent.touches.length == 2){
+                  params = {0:v[0], 1:v[1], 2:v[2], lol:v[3]};  
+                }else{
+                    params = {0:v[0], 1:v[1]}; 
+                }
+
+
+                s.change('hellooo');
                 s._draw();
             };
 
@@ -287,8 +304,25 @@ var displaybar = false;
                 .bind("touchmove.k", touchMove)
                 .bind(
                     "touchend.k"
-                    , function () {
+                    , function (e) {
+                        if(e.originalEvent.touches.length == 0){
                         k.c.d.unbind('touchmove.k touchend.k');
+                    }
+
+                    if(e.originalEvent.touches.length == 2){
+                        
+                        
+
+                        if(!lock){
+                            lock = true
+                        }else{
+                            lock = false
+                        }
+
+                    
+
+
+                    }
 
                         if (
                             s.rH
@@ -312,7 +346,7 @@ var displaybar = false;
                     s.cH
                     && (s.cH(v) === false)
                 ) return;
-                    
+              
                 s.change(v);
                 s._draw();
             };
@@ -372,7 +406,7 @@ var displaybar = false;
 
         this._listen = function () {
 
-            console.log(this.seek);
+      
 
             if(!this.seek){
 
@@ -392,7 +426,10 @@ var displaybar = false;
                     .bind(
                         "touchend"
                         , function (e) {
+                            if(e.originalEvent.touches.length == 0 && !lock){
                             socket.emit('fx_on',{value: false});
+                        }
+                            
                          }
                     )
                     .bind(
@@ -405,6 +442,7 @@ var displaybar = false;
                         "touchcancel"
                         , function (e) {
                             socket.emit('fx_on',{value: false});
+                      
                          }
                     )
                     .bind(
@@ -649,8 +687,9 @@ if (!this.o.readOnly) {
                                 s.o.stopper
                                 && (v = max(min(v, s.o.max), s.o.min));
 
-                                console.log(v);
-                                    v['touches'] = e.originalEvent.touches.length;
+                 
+                                
+                                v['touches'] = e.originalEvent.touches.length;
                                 s.change(v);
                                 s._draw();
 
@@ -916,6 +955,7 @@ if (!this.o.readOnly) {
             this.cv = v;
             this.i[0].val(this.cv[0]);
             this.i[1].val(this.cv[1]);
+
         };
 
         this.val = function (v) {

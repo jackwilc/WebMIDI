@@ -1,4 +1,3 @@
-// RequestAnimFrame: a browser API for getting smooth animations
 window.requestAnimFrame = (function(){
   return  window.requestAnimationFrame       || 
 		  window.webkitRequestAnimationFrame || 
@@ -12,23 +11,12 @@ window.requestAnimFrame = (function(){
 
 var mousedown = true;
 
-
-// Initialize the canvas first with 2d context like 
-// we always do.
 var canvas = document.getElementById("xy");
 
 var offscreenCanvas = document.createElement('canvas');
 
-	
-	// Now get the height and width of window so that
-	// it works on every resolution. Yes! on mobiles too.
 	W = window.innerWidth,
 	H = window.innerHeight;
-
-
-// Set the canvas to occupy FULL space. We want our creation
-// to rule, don't we?
-
 
 if($(window).width() > 500){
 	canvas.width = 500;
@@ -47,11 +35,6 @@ var ctx = canvas.getContext("2d");
 
 var ctxMain = canvas.getContext('2d');
 
-
-
-
-
-
 canvas.addEventListener("touchstart",mouseDown, false);
 canvas.addEventListener("touchmove",touchXY, false);
 canvas.addEventListener("touchend",mouseUp, false);
@@ -59,8 +42,6 @@ canvas.addEventListener("mouseup",mouseUp, false);
 canvas.addEventListener("mousedown",mouseDown, false);
 canvas.addEventListener("mousemove",mouseXY, false);
 
-
-// Some variables for later use
 var circles = [],
 	circlesCount = 7,
 	mouse = {},
@@ -68,19 +49,13 @@ var circles = [],
 
 var circlesrendered = circlesCount;
 
-// Every basic and common thing is done. Now we'll create
-// a function which will paint the canvas black.
 function paintCanvas() {
 	
-	// Default fillStyle is also black but specifying it
-	// won't hurt anyone and we can change it back later.
-	// If you want more controle over colors, then declare
-	// them in a variable.
 	var rgbx = Math.round((mouse.x/canvas.width)*255);
 	var rgby = Math.round((mouse.y/canvas.height)*255);
 
 	ctx.globalCompositeOperation = "source-over";
-	//ctx.fillStyle = "rgb(0,0,0,0)";
+
 	if(mouseIsDown){
 	var rgbz = pulse.pulse() * 255;
 
@@ -95,7 +70,6 @@ function paintCanvas() {
 	rgbz = Math.floor(rgbz);
 	ctx.fillStyle = "rgb("+ rgbx +","+ rgby +", " + rgbz + ")";
 
-	//$('#xy').css('background-color', "rgb("+ rgbx +","+ rgby +", " + rgbz + ")");
 	ctx.fillRect(0, 0, W, H);
 
 }else{
@@ -112,10 +86,6 @@ function paintCanvas() {
 	//ctx.fillRect(0, 0, W, H);
 }
 
-// This will act as a class which we will use to create
-// circle objects. Also, remember that class names are
-// generally started with a CAPITAL letter and are 
-// singular
 function Circle() {
 	this.x = Math.random() * W;
 	this.y = Math.random() * H;
@@ -127,7 +97,6 @@ function Circle() {
 	this.color = "rgb("+ this.r +", "+ this.g +", "+ this.b +")";
 	
 	this.draw = function() {
-		//this.radius = 90 + (pulse.pulse() * 40)
 		ctx.globalCompositeOperation = "lighter";
 		ctx.beginPath();
 		ctx.fillStyle = this.color;
@@ -137,16 +106,16 @@ function Circle() {
 	}
 }
 
-// Insert a random circle to the circles array.
+
 for(var i = 0; i < circlesCount; i++) {
 	circles.push(new Circle());
 }
 
-// A function that will be called in the loop, so
-// consider it as the `main` function
 function draw() {
 
 	paintCanvas();
+
+	
 
 	for(i = 0; i < circlesCount; i++) {
 		var c1 = circles[i],
@@ -173,6 +142,13 @@ function draw() {
 		}
 }
 
+if(lock){
+		var textx = canvas.width / 2;
+	ctx.fillStyle="#FFFFFF";
+	ctx.font = (20 + pulse.pulse() * 5) + "px Arial";
+	ctx.textAlign = 'center';
+	ctx.fillText("LOCKED",textx,40);
+}
 if(!mouseIsDown){
 	if(circlesrendered > 0){
 	circlesrendered = circlesrendered - 1;
@@ -182,22 +158,24 @@ if(!mouseIsDown){
 
 }
 
-function mouseUp() {
-	console.log("Mouse Up!")
+function mouseUp(e) {
+
+	if(e.touches.length == 0 && !lock){
 	mouseIsDown = false;
 	circlesrendered = 0;
+}
 }
  
 function touchUp() {
 }
  
 function mouseDown(e) {
-	console.log('Mouse Down!');
+	
     mouseIsDown = true;
     circlesrendered = circlesCount;
     mouse.x = e.pageX - canvas.offsetLeft;
     mouse.y = e.pageY - canvas.offsetTop;
-    console.log(circlesrendered);
+
 }
  
 function touchDown(e) {
@@ -222,7 +200,6 @@ function touchXY(e) {
  
 }
 
-// The loop
 function animloop() {
 
     draw();
@@ -234,9 +211,9 @@ function animloop() {
 animloop();
 
 $( "body" ).mouseup(function() {
-  socket.emit('fx_on',{value: false});
+  //socket.emit('fx_on',{value: false});
   paintCanvas();
-  mouseIsDown = false;
+  //mouseIsDown = false;
 });
 
 
